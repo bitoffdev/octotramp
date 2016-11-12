@@ -97,7 +97,7 @@ function keyPressed(){
 		text(START_MESSAGE, GAME_WIDTH/2, START_MESSAGE_YPOS);
 		textSize(GAME_TITLE_SIZE);
 		textAlign(CENTER);
-		fill(255);
+		fill(220,220,220);
 		GAME_STARTED = 1;
 	}
 	switch(keyCode){
