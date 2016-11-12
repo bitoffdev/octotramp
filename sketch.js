@@ -21,11 +21,14 @@ class Player{
 }
 
 var thePlayer=new Player();
+var environment;
+
 
 function setup()
 {
   // set canvas size
   createCanvas(GAME_WIDTH,GAME_HEIGHT);
+	environment = new Environment(5000,GAME_HEIGHT);
 }
 
 function drawBackground(){
@@ -55,7 +58,8 @@ function drawPlayer(){
 
 function draw()
 {
-	drawBackground();
+	environment.drawit();
+	//drawBackground();
 	drawPlayer();
 }
 
