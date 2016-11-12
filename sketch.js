@@ -29,17 +29,17 @@ var nextSpot=0;
 class Player{
 	constructor(){
 		this.playerSpeed=STARTING_SPEED;
-		this.xpos=0;
+		this.xpos=100;
 		this.ypos=0;
 	}
 }
 
-class Trampoline{
-	constructor(){
-		//trampoline width
-		this.size=15
-	}
-}
+// class Trampoline{
+// 	constructor(){
+// 		//trampoline width
+// 		this.size=15
+// 	}
+// }
 
 
 var thePlayer=new Player();
@@ -73,45 +73,21 @@ function drawBackground(){
 	textAlign(CENTER);
 }
 
-/**
-Computes the location of the next landing point for the player,
-to appropriately place a trampoline. This is done by calculating
-the next time where |sin(x)| will be zero, and using the speed
-times frame rate.
-*/
-function computeNextTrampoline(){
-	var current=thePlayer.xpos;
-
-	var oldTime=millis();
-
-	//formula found using some algebra. adding pi to the time will result in
-	//the next 'zero', so use this to determine next time
-	// (t1/const) + pi = (t2/const) -> t2 = t1 + pi*const
-	var newTime=oldTime+ Math.PI*TIME_CONSTANT;
-
-	nextSpot=current+(newTime-oldTime)*getFrameRate()*thePlayer.playerSpeed;
-}
-
 function drawTrampoline(){
 	fill(0,255,0);
 	ellipse(nextSpot%GAME_WIDTH,GAME_HEIGHT,50,50);
 }
 
 function drawPlayer(){
-	//thePlayer.xpos+=thePlayer.playerSpeed;
 	environment.scrollX += thePlayer.playerSpeed;
 
-	var sinShenanigans=Math.abs(sin(millis()/TIME_CONSTANT))*(GAME_HEIGHT);
-	var sinShenanigans=(sin(millis()/TIME_CONSTANT))*(GAME_HEIGHT-100);
-	if(sinShenanigans<0) sinShenanigans*=-1;
+	var sinShenanigans = Math.abs(sin(Math.PI*frameCount/60)) * (GAME_HEIGHT-200);
 	thePlayer.ypos=GAME_HEIGHT-sinShenanigans;
 
-	//ball is hitting the ground
-	// if(sinShenanigans<10){
-	// 	console.log("player pos="+thePlayer.xpos);
-	// 	console.log("tramp pos="+nextSpot%GAME_WIDTH);
-	// 	computeNextTrampoline();
-	// }
+	if (frameCount%60 == 0){
+		var pos = environment.scrollX + thePlayer.playerSpeed * (60 - frameCount%60);
+		environment.addTrampoline(pos + thePlayer.xpos);
+	}
 
 
 	if(thePlayer.xpos>GAME_WIDTH){
@@ -157,17 +133,19 @@ function keyPressed(){
 	}
 	switch(keyCode){
 		case LEFT_ARROW:
-			thePlayer.xpos-=DIST_BETWEEN_TRAMPS;
+			//thePlayer.xpos-=DIST_BETWEEN_TRAMPS;
+			environment.scrollX -= DIST_BETWEEN_TRAMPS;
 			break;
 		case RIGHT_ARROW:
-			thePlayer.xpos+=DIST_BETWEEN_TRAMPS;
-				if(thePlayer.playerSpeed > 0){
-					thePlayer.playerSpeed-=SPEED_MODIFIER;
-				}
+			//thePlayer.xpos+=DIST_BETWEEN_TRAMPS;
+			environment.scrollX += DIST_BETWEEN_TRAMPS;
+				// if(thePlayer.playerSpeed > 0){
+				// 	thePlayer.playerSpeed-=SPEED_MODIFIER;
+				// }
 			break;
-		case RIGHT_ARROW:
-				thePlayer.playerSpeed+=SPEED_MODIFIER;
-			break;
+		// case RIGHT_ARROW:
+		// 		thePlayer.playerSpeed+=SPEED_MODIFIER;
+		// 	break;
 		default:
 			break;
 	}
