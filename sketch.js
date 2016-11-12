@@ -28,16 +28,12 @@ function setup()
 {
   // set canvas size
   createCanvas(GAME_WIDTH,GAME_HEIGHT);
-	environment = new Environment(5000,GAME_HEIGHT);
-}
-
-function drawBackground(){
-	//placeholder background; just a clear white color
-	background(255);
+	environment = new Environment(10000,GAME_HEIGHT);
 }
 
 function drawPlayer(){
-	thePlayer.xpos+=thePlayer.playerSpeed;
+	//thePlayer.xpos+=thePlayer.playerSpeed;
+	environment.scrollX += thePlayer.playerSpeed;
 
 	var sinShenanigans=(sin(millis()/TIME_CONSTANT))*(GAME_HEIGHT);
 	if(sinShenanigans<0) sinShenanigans*=-1;
@@ -58,8 +54,7 @@ function drawPlayer(){
 
 function draw()
 {
-	environment.drawit();
-	//drawBackground();
+	environment.drawEnvironment();
 	drawPlayer();
 }
 
