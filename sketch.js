@@ -39,12 +39,9 @@ function setup()
 {
   // set canvas size
   createCanvas(GAME_WIDTH,GAME_HEIGHT);
-<<<<<<< HEAD
 	characterImage = loadImage("assets/octocat.png");
 	image(characterImage, 0, 0);
-=======
 	environment = new Environment(5000,GAME_HEIGHT);
->>>>>>> 37711129b59bed8a1185989a8b42add36803aced
 }
 
 function drawBackground(){
@@ -86,7 +83,7 @@ function drawPlayer(){
 function draw()
 {
 	environment.drawit();
-	//drawBackground();
+	drawBackground();
 	drawPlayer();
 }
 
