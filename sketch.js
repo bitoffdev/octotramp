@@ -54,8 +54,8 @@ var thePlayer;
 
 // Assets
 var characterImage;
-const CHARACTER_WIDTH=75;
-const CHARACTER_HEIGHT=75;
+const CHARACTER_WIDTH=80;
+const CHARACTER_HEIGHT=80;
 
 var trampolineImage;
 const TRAMPOLINE_WIDTH=100;
@@ -72,6 +72,9 @@ class Player{
 		this.translateX = 0;
 		this.xpos=GAME_WIDTH/2;
 		this.ypos=0;
+		// animations
+		this.rot = 0;
+		this.anim = 0;
 	}
 	drawPlayer(){
 		// Lerp the x position
@@ -82,9 +85,24 @@ class Player{
 		// calculate the player's height
 		var sinShenanigans = Math.abs(sin(Math.PI*frameCount/TIME_CONSTANT)) * (GAME_HEIGHT-200);
 		thePlayer.ypos=GAME_HEIGHT-sinShenanigans;
-		// player sprite
-		image(characterImage,thePlayer.xpos, thePlayer.ypos-100,
-			CHARACTER_WIDTH,CHARACTER_HEIGHT);
+		// do flip
+		if (this.rot > 0){
+			push();
+			translate(thePlayer.xpos+CHARACTER_WIDTH/2, thePlayer.ypos-100+CHARACTER_HEIGHT/2);
+			if (this.anim==0){
+				rotate(this.rot);
+			} else {
+				scale(1, Math.cos(this.rot));
+			}
+			translate(-CHARACTER_WIDTH/2, -CHARACTER_HEIGHT/2);
+			image(characterImage,0,0,CHARACTER_WIDTH,CHARACTER_HEIGHT);
+			pop();
+			this.rot -= PI / 30;
+		} else {
+			// player sprite
+			image(characterImage,thePlayer.xpos, thePlayer.ypos-100,
+				CHARACTER_WIDTH,CHARACTER_HEIGHT);
+		}
 	}
 }
 
@@ -184,6 +202,10 @@ function drawTrampoline(){
 	}
 
 	if(gameState > 0){
+		if (total_score%10==6){
+			thePlayer.rot = 2*PI;
+			thePlayer.anim = thePlayer.anim==0 ? 1 : 0;
+		}
 		trampolinesJumped++;total_score++;
 		if(trampolinesJumped%TRAMPOLINES_PER_DIFFICULTY==0){
 			difficulty++;
@@ -234,18 +256,19 @@ function draw() {
 
 		drawArrow();
 
+		textAlign(RIGHT);
 		for (var i=0;i<leaders.length;i++){
-			text(leaders[i], LEADERBOARD_TITLE_XPOS, LEADERBOARD_TITLE_YPOS + i * 20 + 40);
+			text(leaders[i], LEADERBOARD_XPOS + 200, LEADERBOARD_TITLE_YPOS + i * 20 + 40);
 		}
 		// Generate the next trampoline each time the player touches the ground
 		if (frameCount%60 == 0){
 			// Trampolines are ellipses, which are anchored in the center by default.
 			// The player is an image, anchored by bottom left by default
 			// Trampoline Screen Position - Player Screen Position = Player Width / 2 = 37.5
-			var diff = environment.trampolines[environment.trampolines.length-2] - environment.scrollX - thePlayer.xpos - 37.5;
-			if (diff < -87.5 || diff > 87.5){
-				var diff2 = environment.trampolines[environment.trampolines.length-1] - environment.scrollX - thePlayer.xpos - 37.5;
-				if (diff2 < -87.5 || diff2 > 87.5){
+			var diff = environment.trampolines[environment.trampolines.length-2] - environment.scrollX - thePlayer.xpos - CHARACTER_WIDTH/2;
+			if (Math.abs(diff) > CHARACTER_WIDTH/2 + TRAMPOLINE_WIDTH){
+				var diff2 = environment.trampolines[environment.trampolines.length-1] - environment.scrollX - thePlayer.xpos - CHARACTER_WIDTH/2;
+				if (Math.abs(diff2) > CHARACTER_WIDTH/2 + TRAMPOLINE_WIDTH){
 					gameState = 4; // game over
 				}
 			}
