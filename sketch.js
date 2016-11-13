@@ -200,7 +200,7 @@ function draw() {
 		if (frameCount%60 == 0){
 			var diff = environment.trampolines[environment.trampolines.length-1] - 40 - environment.scrollX - thePlayer.xpos;
 
-			if (diff < -60 || diff > 60){
+			if (diff < -87.5 || diff > 87.5){
 				gameState = 4; // game over
 			}
 			drawTrampoline();
