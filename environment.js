@@ -31,7 +31,8 @@ function Environment(height){
 		noStroke();
 		fill(color(156, 218, 239));
 		for (var i=0;i<this.trampolines.length;i++){
-			ellipse(this.trampolines[i]-this.scrollX, height-20, 100, 40);
+			ellipse(this.trampolines[i]-this.scrollX, height-20,
+				TRAMPOLINE_WIDTH,TRAMPOLINE_HEIGHT);
 		}
 	}
 }
