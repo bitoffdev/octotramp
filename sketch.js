@@ -12,8 +12,9 @@
 const GAME_WIDTH=window.innerWidth;
 const GAME_HEIGHT=window.innerHeight;
 const DIST_BETWEEN_TRAMPS=100;
+
 const START_SPEED = 10;
-const TRAMPOLINES_PER_DIFFICULTY=2; //number of trampolines before the difficulty increases
+const SPEED_MODIFIER=1;
 
 // State Variables
 var GAME_STARTED = 0;
@@ -21,6 +22,10 @@ var validSpots=[]; //list of valid trampoline x positions
 var difficulty=0; //determines how far a trampoline can spawn from the center
 var maxTrampolinesFromCenter=0; //furthest from the center a trampoline can spawn (dependent on screen width)
 var trampolinesJumped=0; //amount of trampolines jumped on, determines difficulty
+
+//number of trampolines before the difficulty increases
+var TRAMPOLINES_PER_DIFFICULTY=10;
+var MAX_DIFFICULTY=2;
 
 // Classes/Objects
 var waitingscreen;
@@ -51,9 +56,23 @@ class Player{
 	}
 }
 
-function setup() {
-  // set canvas size
-  createCanvas(GAME_WIDTH,GAME_HEIGHT);
+//list of valid trampoline x positions
+var validSpots=[];
+//determines how far a trampoline can spawn from the center
+var difficulty=0;
+//furthest from the center a trampoline can spawn (dependent on screen width)
+var maxTrampolinesFromCenter=0;
+//amount of trampolines jumped on, determines difficulty
+var trampolinesJumped=0;
+var lastTrampolineSpot=0;
+
+var thePlayer=new Player();
+var environment;
+
+function setup()
+{
+	// set canvas size
+	createCanvas(GAME_WIDTH,GAME_HEIGHT);
 
 	// load images
 	characterImage = loadImage("assets/octocat.png");
@@ -77,17 +96,29 @@ function setup() {
 	drawTrampoline();
 }
 
-function drawTrampoline() {
-	var spot=validSpots[int(Math.random()*difficulty)];
+function drawTrampoline(){
+	var maxT=lastTrampolineSpot+difficulty;
+	var minT=lastTrampolineSpot-difficulty;
+
+	var spot=minT+int(Math.random()*(maxT-minT));
+
+	if(spot<0) spot=0;
+	if(spot>validSpots.length) spot=validSpots.length-1;
 
 	var pos = environment.scrollX + thePlayer.playerSpeed * (60 - frameCount%60);
-	environment.addTrampoline(pos+spot + 40);
+	environment.addTrampoline(pos+validSpots[spot] + 40);
 
 	if(GAME_STARTED){
 		trampolinesJumped++;
-		if(trampolinesJumped%TRAMPOLINES_PER_DIFFICULTY==0)
+		if(trampolinesJumped%TRAMPOLINES_PER_DIFFICULTY==0){
 			difficulty++;
+			thePlayer.playerSpeed+=SPEED_MODIFIER;
+		}
+		if(difficulty>MAX_DIFFICULTY)
+			difficulty=MAX_DIFFICULTY;
 	}
+
+	lastTrampolineSpot=spot;
 }
 
 function draw()
