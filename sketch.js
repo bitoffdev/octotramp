@@ -34,6 +34,7 @@ var thePlayer;
 
 // Assets
 var characterImage;
+var logo;
 
 class Player{
 	constructor(){
@@ -76,6 +77,7 @@ function setup()
 
 	// load images
 	characterImage = loadImage("assets/octocat.png");
+	logo = loadImage("assets/title_logo.png")
 	trampolineImage = loadImage("assets/trampoline.png");
 
 	// Initialize Classes
