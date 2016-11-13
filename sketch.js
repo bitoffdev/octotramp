@@ -7,81 +7,75 @@
  * @author Chris Baudouin
  * @author Maximillian McMullen
  */
-//how much the player can modify their speed
-const SPEED_MODIFIER=1;
 
-//affects how sensitive the sin functions are since
-//the position is a function of sin and time
-const TIME_CONSTANT=500;
-
-const GAME_WIDTH=640;
-const GAME_HEIGHT=480;
-
+// Constant
+const GAME_WIDTH=window.innerWidth;
+const GAME_HEIGHT=window.innerHeight;
 const DIST_BETWEEN_TRAMPS=100;
-const GAME_TITLE_YPOS = ((GAME_HEIGHT/2)/2);
-const GAME_TITLE = "OCTOTRAMP";
-const GAME_TITLE_SIZE = 32;
-const START_MESSAGE = "press any key to start";
-const START_MESSAGE_YPOS = ((GAME_HEIGHT/2)/2) + (((GAME_HEIGHT/2)/2)/2);
-const START_MESSAGE_SIZE = 24;
+const START_SPEED = 10;
+const TRAMPOLINES_PER_DIFFICULTY=2; //number of trampolines before the difficulty increases
 
-var DEFAULT_SPEED=10;
-var STARTING_SPEED = 0;
-
+// State Variables
 var GAME_STARTED = 0;
+var validSpots=[]; //list of valid trampoline x positions
+var difficulty=0; //determines how far a trampoline can spawn from the center
+var maxTrampolinesFromCenter=0; //furthest from the center a trampoline can spawn (dependent on screen width)
+var trampolinesJumped=0; //amount of trampolines jumped on, determines difficulty
 
-var characterImage;
+// Classes/Objects
 var waitingscreen;
+var environment;
+var thePlayer;
 
-var nextSpot=0;
+// Assets
+var characterImage;
 
 class Player{
 	constructor(){
-		this.playerSpeed=STARTING_SPEED;
+		this.playerSpeed = 0;
 		this.xpos=100;
 		this.ypos=0;
 	}
 }
 
-var thePlayer=new Player();
-var environment;
-
-
-
-function setup()
-{
-	// set canvas size
-	createCanvas(GAME_WIDTH,GAME_HEIGHT);
+function setup() {
   // set canvas size
   createCanvas(GAME_WIDTH,GAME_HEIGHT);
+
+	// load images
 	characterImage = loadImage("assets/octocat.png");
-	image(characterImage, 0, 0);
-	environment = new Environment(GAME_HEIGHT);
 	trampolineImage = loadImage("assets/trampoline.png");
-	addNextTrampoline();
+
+	// Initialize Classes
 	waitingscreen = new WaitingScreen(GAME_WIDTH,GAME_HEIGHT);
+	environment = new Environment(GAME_HEIGHT);
+	thePlayer = new Player();
+	thePlayer.xpos=GAME_WIDTH/2;
+	thePlayer.ypos=0;
+
+	// find all valid trampoline spots
+	validSpots.push(thePlayer.xpos);
+	for(var i=1;;i++){
+		if(thePlayer.xpos+(i*DIST_BETWEEN_TRAMPS)>GAME_WIDTH)
+			break;
+
+		validSpots.push(thePlayer.xpos+(i*DIST_BETWEEN_TRAMPS));
+		validSpots.push(thePlayer.xpos-(i*DIST_BETWEEN_TRAMPS));
+	}
+	drawTrampoline();
 }
 
-// function drawBackground(){
-// 	// Draw Environment
-// 	environment.drawEnvironment();
-//
-// 	// Draw Chris' Stuff
-// 	fill(0);
-// 	text(START_MESSAGE, GAME_WIDTH/2, START_MESSAGE_YPOS);
-// 	textSize(GAME_TITLE_SIZE);
-// 	textAlign(CENTER);
-//
-// 	text(GAME_TITLE, GAME_WIDTH/2, GAME_TITLE_YPOS);
-// 	textStyle(BOLD);
-// 	textSize(START_MESSAGE_SIZE);
-// 	textAlign(CENTER);
-//
-// }
+function drawTrampoline() {
+	var spot=validSpots[int(Math.random()*difficulty)];
 
-function addNextTrampoline(){
 	var pos = environment.scrollX + thePlayer.playerSpeed * (60 - frameCount%60);
-	environment.addTrampoline(pos + thePlayer.xpos);
+	environment.addTrampoline(pos+spot + 40);
+
+	if(GAME_STARTED){
+		trampolinesJumped++;
+		if(trampolinesJumped%TRAMPOLINES_PER_DIFFICULTY==0)
+			difficulty++;
+	}
 }
 
 function drawPlayer(){
@@ -90,21 +84,8 @@ function drawPlayer(){
 	var sinShenanigans = Math.abs(sin(Math.PI*frameCount/60)) * (GAME_HEIGHT-200);
 	thePlayer.ypos=GAME_HEIGHT-sinShenanigans;
 
-	// Generate the next trampoline each time the player touches the ground
-	if (frameCount%60 == 0){
-		addNextTrampoline();
-	}
-
+	//player sprite
 	image(characterImage,thePlayer.xpos, thePlayer.ypos-100, 75, 75);
-
-	// debug info
-	//  fill(0);
-	//  text("framerate = " + getFrameRate(), 25, 25);
-}
-
-function increaseSpeed(){
-	thePlayer.playerSpeed+=SPEED_MODIFIER;
-	console.log('speed increasing');
 }
 
 function draw()
@@ -114,32 +95,32 @@ function draw()
 	} else {
 		environment.drawEnvironment();
 		drawPlayer();
+		// Generate the next trampoline each time the player touches the ground
+		if (frameCount%60 == 0){
+			drawTrampoline();
+		}
 	}
 }
 
 /**
-Handle keyboard input.
-
-Left arrow decreases speed, right arrow increases speed
-*/
+ * Handle keyboard input.
+ */
 function keyPressed(){
 	if(GAME_STARTED == 0){
-		thePlayer.playerSpeed = DEFAULT_SPEED;
-		text(START_MESSAGE, GAME_WIDTH/2, START_MESSAGE_YPOS);
-		textSize(GAME_TITLE_SIZE);
-		textAlign(CENTER);
-		fill(220,220,220);
+		thePlayer.playerSpeed = START_SPEED;
 		GAME_STARTED = 1;
+		drawTrampoline();
 		return;
 	}
+
 	switch(keyCode){
 		case LEFT_ARROW:
-			//thePlayer.xpos-=DIST_BETWEEN_TRAMPS;
-			environment.translateX -= DIST_BETWEEN_TRAMPS;
+			if(thePlayer.xpos-DIST_BETWEEN_TRAMPS>0)
+				thePlayer.xpos-=DIST_BETWEEN_TRAMPS;
 			break;
 		case RIGHT_ARROW:
-			//thePlayer.xpos+=DIST_BETWEEN_TRAMPS;
-			environment.translateX += DIST_BETWEEN_TRAMPS;
+			if(thePlayer.xpos+DIST_BETWEEN_TRAMPS<GAME_WIDTH)
+				thePlayer.xpos+=DIST_BETWEEN_TRAMPS;
 			break;
 	}
 }
