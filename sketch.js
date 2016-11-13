@@ -10,6 +10,7 @@
 
 
 // Constant
+const TIME_CONSTANT=60;
 const DIST_BETWEEN_TRAMPS = 100;
 const GAME_WIDTH = window.innerWidth;
 const GAME_HEIGHT = window.innerHeight;
@@ -59,6 +60,8 @@ var trampolineImage;
 const TRAMPOLINE_WIDTH=100;
 const TRAMPOLINE_HEIGHT=40;
 
+var balloonImage;
+
 var hubotImage;
 var logo;
 
@@ -76,7 +79,7 @@ class Player{
 		// Scroll the background
 		environment.scrollX += thePlayer.playerSpeed;
 		// calculate the player's height
-		var sinShenanigans = Math.abs(sin(Math.PI*frameCount/60)) * (GAME_HEIGHT-200);
+		var sinShenanigans = Math.abs(sin(Math.PI*frameCount/TIME_CONSTANT)) * (GAME_HEIGHT-200);
 		thePlayer.ypos=GAME_HEIGHT-sinShenanigans;
 		// player sprite
 		image(characterImage,thePlayer.xpos, thePlayer.ypos-100,
@@ -107,6 +110,9 @@ function setup()
 	characterImage = loadImage("assets/octocat.png");
 	hubotImage = loadImage("assets/hubot.jpg");
 	logo = loadImage("assets/title_logo.png");
+
+	balloonImage=loadImage("assets/cute_balloon.jpg");
+	balloonX=3000;
 
 
 	// Initialize Classes
@@ -147,6 +153,9 @@ function drawTrampoline(){
 
 			//trigger inspirational quote
 			spawnQuote();
+
+			if(trampolinesJumped%15==0)
+				spawnBalloon();
 		}
 		if(difficulty>MAX_DIFFICULTY)
 			difficulty=MAX_DIFFICULTY;
@@ -198,6 +207,8 @@ function draw() {
 		// flashy effects
 
 		continueQuotes();
+		continueBalloon();
+
 	}
 }
 

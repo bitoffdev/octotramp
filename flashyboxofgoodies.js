@@ -39,7 +39,14 @@ var STRINGS_WITHIN_EDGE=GAME_WIDTH/3; //within 1/3 of edge
 
 var activeQuotes=[];
 
+var balloonX=0;
+var balloonY=0;
 
+
+/**
+Creates a random quote from the list, and initializes it to float across the
+screen in a random location.
+*/
 function spawnQuote(){
 
 	var activeQuote=new Quote();
@@ -81,6 +88,10 @@ function spawnQuote(){
 	activeQuotes.push(activeQuote);
 }
 
+/**
+Continue each quote animation, having each float in the direction they were
+initialized in. If a quote goes offscreen, it is removed.
+*/
 function continueQuotes(){
 	for(var i=0;activeQuotes && i<activeQuotes.length;i++){
 		current=activeQuotes[i];
@@ -113,4 +124,28 @@ function continueQuotes(){
 				i--;
 		}
 	}
+}
+
+/**
+'Spawns' a balloon on the screen. What's really happening is the balloon's
+x position is reset to 0, so that it appears as though it just appeared.
+Lazy? Yes. Effective? Also yes.
+*/
+function spawnBalloon(){
+	var start=int(Math.random()*GAME_HEIGHT/2);
+
+	balloonX=0;
+	balloonY=start;
+
+}
+
+/**
+Continues balloon animation in a circular pattern across the screen
+*/
+function continueBalloon(){
+	balloonX+=5;
+	var balloonXPos=(sin(3*frameCount/TIME_CONSTANT)+1)*100 + balloonX;
+	var balloonYPos=(cos(3*frameCount/TIME_CONSTANT)+1)*GAME_HEIGHT/2 - balloonY;
+
+	image(balloonImage,balloonXPos, balloonYPos,100,100);
 }
