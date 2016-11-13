@@ -1,5 +1,18 @@
-// Non-buffered version
-function Environment(width, height){
+/**
+ * environment.js
+ *
+ * This object manages the drawing of the background of the main game, including
+ * the trampolines
+ *
+ * This version is non-buffered. The original version used buffered rendering
+ * for efficiency, but it had hardware problems with mobile and some graphics
+ * cards.
+ *
+ * @author Elliot Miller
+ * @author Chris Baudouin
+ * @author Maximillian McMullen
+ */
+function Environment(height){
 	this.trampolines = [];
 
 	this.translateX = 0; // This value is used for arrow-key translation
@@ -22,34 +35,3 @@ function Environment(width, height){
 		}
 	}
 }
-// Buffered Version
-/*
-function Environment(width, height){
-	// load sprites
-	img = loadImage("assets/trampoline.png");
-	// create buffer
-	this.buffer = createGraphics(width, height);
-	this.buffer.background(220,220,220);
-
-	this.trampolines = [];
-
-	for (var i=0;i<30;i++){
-		this.buffer.noStroke();
-		this.buffer.fill(color(156, 218, 239));
-		this.buffer.ellipse(i*200, height-20, 100, 40);
-	}
-	this.buffer.rect(30*200, 0, 20, height);
-
-	this.scrollX = 0;
-
-	this.addTrampoline = function(x){
-		this.buffer.noStroke();
-		this.buffer.fill(color(0, 255, 0));
-		this.buffer.ellipse(x, height-20, 100, 40);
-	}
-
-	this.drawEnvironment = function(){
-		image(this.buffer,-this.scrollX,0);
-	}
-}
-*/

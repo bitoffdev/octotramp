@@ -1,4 +1,12 @@
-
+/**
+ * sketch.js
+ *
+ * This is the main javascript file that is called by Processing.js
+ *
+ * @author Elliot Miller
+ * @author Chris Baudouin
+ * @author Maximillian McMullen
+ */
 //how much the player can modify their speed
 const SPEED_MODIFIER=1;
 
@@ -23,6 +31,7 @@ var STARTING_SPEED = 0;
 var GAME_STARTED = 0;
 
 var characterImage;
+var waitingscreen;
 
 var nextSpot=0;
 
@@ -47,25 +56,28 @@ function setup()
   createCanvas(GAME_WIDTH,GAME_HEIGHT);
 	characterImage = loadImage("assets/octocat.png");
 	image(characterImage, 0, 0);
-	environment = new Environment(10000,GAME_HEIGHT);
+	environment = new Environment(GAME_HEIGHT);
+	trampolineImage = loadImage("assets/trampoline.png");
 	addNextTrampoline();
+	waitingscreen = new WaitingScreen(GAME_WIDTH,GAME_HEIGHT);
 }
 
-function drawBackground(){
-	// Draw Environment
-	environment.drawEnvironment();
-
-	// Draw Chris' Stuff
-	fill(0);
-	text(START_MESSAGE, GAME_WIDTH/2, START_MESSAGE_YPOS);
-	textSize(GAME_TITLE_SIZE);
-	textAlign(CENTER);
-
-	text(GAME_TITLE, GAME_WIDTH/2, GAME_TITLE_YPOS);
-	textStyle(BOLD);
-	textSize(START_MESSAGE_SIZE);
-	textAlign(CENTER);
-}
+// function drawBackground(){
+// 	// Draw Environment
+// 	environment.drawEnvironment();
+//
+// 	// Draw Chris' Stuff
+// 	fill(0);
+// 	text(START_MESSAGE, GAME_WIDTH/2, START_MESSAGE_YPOS);
+// 	textSize(GAME_TITLE_SIZE);
+// 	textAlign(CENTER);
+//
+// 	text(GAME_TITLE, GAME_WIDTH/2, GAME_TITLE_YPOS);
+// 	textStyle(BOLD);
+// 	textSize(START_MESSAGE_SIZE);
+// 	textAlign(CENTER);
+//
+// }
 
 function addNextTrampoline(){
 	var pos = environment.scrollX + thePlayer.playerSpeed * (60 - frameCount%60);
@@ -83,7 +95,7 @@ function drawPlayer(){
 		addNextTrampoline();
 	}
 
-	image(characterImage,thePlayer.xpos, thePlayer.ypos-100);
+	image(characterImage,thePlayer.xpos, thePlayer.ypos-100, 75, 75);
 
 	// debug info
 	//  fill(0);
@@ -97,8 +109,12 @@ function increaseSpeed(){
 
 function draw()
 {
-	drawBackground();
-	drawPlayer();
+	if (GAME_STARTED == 0){
+		waitingscreen.drawScreen();
+	} else {
+		environment.drawEnvironment();
+		drawPlayer();
+	}
 }
 
 /**
@@ -114,6 +130,7 @@ function keyPressed(){
 		textAlign(CENTER);
 		fill(220,220,220);
 		GAME_STARTED = 1;
+		return;
 	}
 	switch(keyCode){
 		case LEFT_ARROW:
@@ -123,9 +140,6 @@ function keyPressed(){
 		case RIGHT_ARROW:
 			//thePlayer.xpos+=DIST_BETWEEN_TRAMPS;
 			environment.translateX += DIST_BETWEEN_TRAMPS;
-				// if(thePlayer.playerSpeed > 0){
-				// 	thePlayer.playerSpeed-=SPEED_MODIFIER;
-				// }
 			break;
 	}
 }
