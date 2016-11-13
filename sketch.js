@@ -181,6 +181,7 @@ function draw() {
 	} else {
 		environment.drawEnvironment();
 		thePlayer.drawPlayer();
+
 		// Display player's current score
 		textSize(START_MESSAGE_SIZE);
 		fill(0);
