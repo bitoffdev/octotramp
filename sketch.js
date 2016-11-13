@@ -33,8 +33,21 @@ var characterImage;
 class Player{
 	constructor(){
 		this.playerSpeed = 0;
+		this.translateX = 0;
 		this.xpos=100;
 		this.ypos=0;
+	}
+	drawPlayer(){
+		// Lerp the x position
+		this.xpos += this.translateX * 0.25;
+		this.translateX *= 0.75;
+		// Scroll the background
+		environment.scrollX += thePlayer.playerSpeed;
+		// calculate the player's height
+		var sinShenanigans = Math.abs(sin(Math.PI*frameCount/60)) * (GAME_HEIGHT-200);
+		thePlayer.ypos=GAME_HEIGHT-sinShenanigans;
+		// player sprite
+		image(characterImage,thePlayer.xpos, thePlayer.ypos-100, 75, 75);
 	}
 }
 
@@ -51,7 +64,6 @@ function setup() {
 	environment = new Environment(GAME_HEIGHT);
 	thePlayer = new Player();
 	thePlayer.xpos=GAME_WIDTH/2;
-	thePlayer.ypos=0;
 
 	// find all valid trampoline spots
 	validSpots.push(thePlayer.xpos);
@@ -78,23 +90,13 @@ function drawTrampoline() {
 	}
 }
 
-function drawPlayer(){
-	environment.scrollX += thePlayer.playerSpeed;
-
-	var sinShenanigans = Math.abs(sin(Math.PI*frameCount/60)) * (GAME_HEIGHT-200);
-	thePlayer.ypos=GAME_HEIGHT-sinShenanigans;
-
-	//player sprite
-	image(characterImage,thePlayer.xpos, thePlayer.ypos-100, 75, 75);
-}
-
 function draw()
 {
 	if (GAME_STARTED == 0){
 		waitingscreen.drawScreen();
 	} else {
 		environment.drawEnvironment();
-		drawPlayer();
+		thePlayer.drawPlayer();
 		// Generate the next trampoline each time the player touches the ground
 		if (frameCount%60 == 0){
 			drawTrampoline();
@@ -116,11 +118,11 @@ function keyPressed(){
 	switch(keyCode){
 		case LEFT_ARROW:
 			if(thePlayer.xpos-DIST_BETWEEN_TRAMPS>0)
-				thePlayer.xpos-=DIST_BETWEEN_TRAMPS;
+				thePlayer.translateX-=DIST_BETWEEN_TRAMPS;
 			break;
 		case RIGHT_ARROW:
 			if(thePlayer.xpos+DIST_BETWEEN_TRAMPS<GAME_WIDTH)
-				thePlayer.xpos+=DIST_BETWEEN_TRAMPS;
+				thePlayer.translateX+=DIST_BETWEEN_TRAMPS;
 			break;
 	}
 }
