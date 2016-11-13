@@ -34,6 +34,7 @@ var thePlayer;
 
 // Assets
 var characterImage;
+var hubotImage;
 
 class Player{
 	constructor(){
@@ -76,7 +77,7 @@ function setup()
 
 	// load images
 	characterImage = loadImage("assets/octocat.png");
-	trampolineImage = loadImage("assets/trampoline.png");
+	hubotImage = loadImage("assets/hubot.jpg");
 
 	// Initialize Classes
 	waitingscreen = new WaitingScreen(GAME_WIDTH,GAME_HEIGHT);
@@ -130,6 +131,9 @@ function draw()
 		thePlayer.drawPlayer();
 		// Generate the next trampoline each time the player touches the ground
 		if (frameCount%60 == 0){
+			// console.log("Player: " + thePlayer.xpos);
+			// console.log("Tramp: " + (environment.trampolines[environment.trampolines.length-1] - environment.scrollX));
+
 			drawTrampoline();
 		}
 	}
