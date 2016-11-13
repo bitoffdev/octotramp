@@ -133,7 +133,7 @@ function setup()
 		text(SCORE, this.width/2, this.start_message_ypos);
 	}
 	// Load the leaderboard
-	$.ajax({url: "http://54.157.12.226:8000/?action=leaderboard",
+	$.ajax({url: "http://54.157.12.226:8000",
 			success: function(result){
 				var listings = result.split("\n");
 				for (var i=0;i<listings.length;i++){
