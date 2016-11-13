@@ -9,15 +9,20 @@
  */
 
 // Constant
-const GAME_WIDTH=window.innerWidth;
-const GAME_HEIGHT=window.innerHeight;
-const DIST_BETWEEN_TRAMPS=100;
+const DIST_BETWEEN_TRAMPS = 100;
+const GAME_WIDTH = window.innerWidth;
+const GAME_HEIGHT = window.innerHeight;
+const TITLE_SIZE = 32;
+const TITLE_POS = GAME_HEIGHT/2;
+const SUBTITLE_SIZE = 24;
+const SUBTITLE_POS = ((GAME_HEIGHT/2)/2) + (((GAME_HEIGHT/2)/2)/1.6);
 
 const START_SPEED = 10;
 const SPEED_MODIFIER=1;
 
 // State Variables
-var GAME_STARTED = 0;
+var gameState = 0; // 0: Start Screen, 1: Play, 2: Paused, 3: Resuming, 4: Dead
+var pauseFrame = -1;
 var validSpots=[]; //list of valid trampoline x positions
 var difficulty=0; //determines how far a trampoline can spawn from the center
 var maxTrampolinesFromCenter=0; //furthest from the center a trampoline can spawn (dependent on screen width)
@@ -29,6 +34,7 @@ var MAX_DIFFICULTY=2;
 
 // Classes/Objects
 var waitingscreen;
+var deathscreen;
 var environment;
 var thePlayer;
 
@@ -79,10 +85,11 @@ function setup()
 	// load images
 	characterImage = loadImage("assets/octocat.png");
 	hubotImage = loadImage("assets/hubot.jpg");
-	logo = loadImage("assets/title_logo.png")
+	logo = loadImage("assets/title_logo.png");
 
 	// Initialize Classes
 	waitingscreen = new WaitingScreen(GAME_WIDTH,GAME_HEIGHT);
+	deathscreen = new DeathScreen();
 	environment = new Environment(GAME_HEIGHT);
 	thePlayer = new Player();
 	thePlayer.xpos=GAME_WIDTH/2;
@@ -109,9 +116,9 @@ function drawTrampoline(){
 	if(spot>validSpots.length) spot=validSpots.length-1;
 
 	var pos = environment.scrollX + thePlayer.playerSpeed * (60 - frameCount%60);
-	environment.addTrampoline(pos+validSpots[spot] + 40);
+	environment.addTrampoline(pos+validSpots[spot]+40);
 
-	if(GAME_STARTED){
+	if(gameState > 0){
 		trampolinesJumped++;
 		if(trampolinesJumped%TRAMPOLINES_PER_DIFFICULTY==0){
 			difficulty++;
@@ -126,13 +133,26 @@ function drawTrampoline(){
 
 function draw()
 {
-	if (GAME_STARTED == 0){
+	if (gameState==4){
+		deathscreen.drawDeathScreen();
+		return;
+	}
+	if (gameState == 0){
 		waitingscreen.drawScreen();
+	} else if (pauseFrame > -1) {
+		if (gameState == 3 && frameCount%60==pauseFrame%60){ // If Resume State
+			pauseFrame = -1;
+		}
 	} else {
 		environment.drawEnvironment();
 		thePlayer.drawPlayer();
 		// Generate the next trampoline each time the player touches the ground
 		if (frameCount%60 == 0){
+			var diff = environment.trampolines[environment.trampolines.length-1] - 40 - environment.scrollX - thePlayer.xpos;
+			console.log(diff);
+			if (diff < -60 || diff > 100){
+				gameOver();
+			}
 			// console.log("Player: " + thePlayer.xpos);
 			// console.log("Tramp: " + (environment.trampolines[environment.trampolines.length-1] - environment.scrollX));
 
@@ -142,13 +162,34 @@ function draw()
 }
 
 /**
+ * Change the Game's State
+ */
+
+function pauseGame(){
+	if (gameState == 2){ // Pause State
+		gameState = 3; // Resume State
+	} else {
+		pauseFrame = frameCount;
+		gameState = 2; // Pause State
+	}
+}
+function gameOver(){
+	gameState = 4;
+}
+
+
+
+/**
  * Handle keyboard input.
  */
 function keyPressed(){
-	if(GAME_STARTED == 0){
+	if(gameState == 0){
 		thePlayer.playerSpeed = START_SPEED;
-		GAME_STARTED = 1;
+		gameState = 1;
 		drawTrampoline();
+		return;
+	} else if (gameState == 4){
+		deathscreen.deathScreenKeyPressed();
 		return;
 	}
 
@@ -160,6 +201,9 @@ function keyPressed(){
 		case RIGHT_ARROW:
 			if(thePlayer.xpos+DIST_BETWEEN_TRAMPS<GAME_WIDTH)
 				thePlayer.translateX+=DIST_BETWEEN_TRAMPS;
+			break;
+		case ESCAPE:
+			pauseGame();
 			break;
 	}
 }
