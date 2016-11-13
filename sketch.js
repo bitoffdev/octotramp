@@ -35,6 +35,7 @@ var thePlayer;
 // Assets
 var characterImage;
 var hubotImage;
+var logo;
 
 class Player{
 	constructor(){
@@ -78,6 +79,7 @@ function setup()
 	// load images
 	characterImage = loadImage("assets/octocat.png");
 	hubotImage = loadImage("assets/hubot.jpg");
+	logo = loadImage("assets/title_logo.png")
 
 	// Initialize Classes
 	waitingscreen = new WaitingScreen(GAME_WIDTH,GAME_HEIGHT);
