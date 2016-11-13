@@ -56,6 +56,7 @@ function setup()
 	characterImage = loadImage("assets/octocat.png");
 	image(characterImage, 0, 0);
 	environment = new Environment(10000,GAME_HEIGHT);
+	trampolineImage = loadImage("assets/trampoline.png");
 }
 
 function drawBackground(){
@@ -71,11 +72,13 @@ function drawBackground(){
 	textStyle(BOLD);
 	textSize(START_MESSAGE_SIZE);
 	textAlign(CENTER);
+
 }
 
 function drawTrampoline(){
-	fill(0,255,0);
+	fill(220,220,220);
 	ellipse(nextSpot%GAME_WIDTH,GAME_HEIGHT,50,50);
+	//image(trampolineImage, nextSpot%GAME_WIDTH, GAME_HEIGHT, 50, 50);
 }
 
 function drawPlayer(){
@@ -101,8 +104,8 @@ function drawPlayer(){
 	image(characterImage,thePlayer.xpos, thePlayer.ypos-100, 75, 75);
 
 	// debug info
-	 fill(0);
-	 text("framerate = " + getFrameRate(), 25, 25);
+	 //fill(0);
+	 //text("framerate = " + getFrameRate(), 25, 25);
 }
 
 function increaseSpeed(){

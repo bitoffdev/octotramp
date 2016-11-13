@@ -10,10 +10,12 @@ function Environment(width, height){
 
 	this.drawEnvironment = function(){
 		background(220,220,220);
+		//trampolineImage = loadImage("assets/trampoline.png");
 		noStroke();
-		fill(color(0, 255, 0));
+		fill(0);
 		for (var i=0;i<this.trampolines.length;i++){
 			ellipse(this.trampolines[i]-this.scrollX, height-20, 100, 40);
+			//image(trampolineImage, this.trampolines[i]-this.scrollX, height-20);
 		}
 	}
 }
