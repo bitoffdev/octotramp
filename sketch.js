@@ -54,6 +54,7 @@ var difficulty=0; //determines how far a trampoline can spawn from the center
 var maxTrampolinesFromCenter=0; //furthest from the center a trampoline can spawn (dependent on screen width)
 var trampolinesJumped=0; //amount of trampolines jumped on, determines difficulty
 var total_score = 0;
+var leaders = [];
 
 //number of trampolines before the difficulty increases
 const TRAMPOLINES_PER_DIFFICULTY=5;
@@ -140,6 +141,14 @@ function setup()
 		validSpots.push(thePlayer.xpos-(i*DIST_BETWEEN_TRAMPS));
 		text(SCORE, this.width/2, this.start_message_ypos);
 	}
+	// Load the leaderboard
+	$.ajax({url: "http://54.157.12.226:8000/?action=leaderboard",
+			success: function(result){
+				var listings = result.split("\n");
+				for (var i=0;i<listings.length;i++){
+					leaders.push(listings[i]);
+				}
+	}});
 }
 
 function drawTrampoline(){
@@ -195,7 +204,9 @@ function draw() {
 		fill(color(25, 82, 88));
 		textAlign(CENTER);
 		text(LEADERBOARD_TITLE, LEADERBOARD_TITLE_XPOS, LEADERBOARD_TITLE_YPOS);
-
+		for (var i=0;i<leaders.length;i++){
+			text(leaders[i], LEADERBOARD_TITLE_XPOS, LEADERBOARD_TITLE_YPOS + i * 20);
+		}
 
 		// Generate the next trampoline each time the player touches the ground
 		if (frameCount%60 == 0){

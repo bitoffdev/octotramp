@@ -1,4 +1,14 @@
-LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
+/**
+ * deathscreen.js
+ *
+ * Displays a red screen after the player dies and then submits the user's
+ * score to the server.
+ *
+ * @author Elliot Miller
+ * @author Chris Baudouin
+ * @author Maximillian McMullen
+ */
+LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 function DeathScreen(){
 	this.submitted = false;
@@ -22,8 +32,12 @@ function DeathScreen(){
 
 	this.deathScreenKeyPressed = function() {
 		if (keyCode==RETURN || keyCode==ENTER){
-			//TODO submit the username and score to the server
-			location.reload(); // Go back to the loading screen
+			$.ajax({url: "http://54.157.12.226:8000/?action=new&name=" + this.username + "&score=" + total_score,
+			    success: function(result){
+              location.reload(); // Go back to the loading screen
+      }});
+		} else if (keyCode==BACKSPACE && this.username.length > 0){
+			this.username = this.username.slice(0, -1);
 		} else if (LETTERS.indexOf(key) > -1){
 			this.username = this.username + key;
 		}
