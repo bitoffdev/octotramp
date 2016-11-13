@@ -142,6 +142,30 @@ function setup()
 	}});
 }
 
+/**
+Draw an arrow pointing to the next trampoline.
+*/
+function drawArrow(){
+
+	var arrowLength=30;
+
+	var arrowX=thePlayer.xpos+(CHARACTER_WIDTH/2);
+	var arrowY=thePlayer.ypos-CHARACTER_HEIGHT-60;
+
+	var targetX=environment.nextTrampolinePos()-environment.scrollX
+	+(TRAMPOLINE_WIDTH/2);
+	var targetY=environment.height-30;
+
+	var adj=targetX-arrowX;
+	var opp=targetY-arrowY;
+
+	var arrowX2=arrowX+arrowLength*cos(opp/adj);
+	var arrowY2=arrowY+arrowLength*sin(opp/adj);
+
+	stroke(0,0,0);
+	line(arrowX,arrowY,arrowX2,arrowY2);
+}
+
 function drawTrampoline(){
 	var maxT=lastTrampolineSpot+difficulty;
 	var minT=lastTrampolineSpot-difficulty;
@@ -192,6 +216,7 @@ function draw() {
 	} else {
 		environment.drawEnvironment();
 		thePlayer.drawPlayer();
+
 		// Display player's current score
 		textSize(START_MESSAGE_SIZE);
 		fill(0);
@@ -206,6 +231,9 @@ function draw() {
 		fill(color(25, 82, 88));
 		textAlign(CENTER);
 		text(LEADERBOARD_TITLE, LEADERBOARD_TITLE_XPOS, LEADERBOARD_TITLE_YPOS);
+
+		drawArrow();
+
 		for (var i=0;i<leaders.length;i++){
 			text(leaders[i], LEADERBOARD_TITLE_XPOS, LEADERBOARD_TITLE_YPOS + i * 20 + 40);
 		}
