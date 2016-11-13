@@ -8,6 +8,22 @@
  * @author Maximillian McMullen
  */
 
+ var INSPIRATIONAL_STRINGS=[
+	 "Stay committed!",
+	 "When push comes to shove...",
+	 "git push your dreams... before they get crushed",
+	 "You can pull through!",
+	 "git checkout the high scores when you're done!",
+	 "If you don't do too well, you can always git reset!",
+	 "git show me what you've got",
+	 "It makes no diff to me",
+	 "At this rate, you're going to git add your name to the high scores!",
+	 "rm all your doubts!",
+	 "git fetch silly-quotes.git",
+	 "Keep mv'ing!",
+	 "The difficulty isn't going to revert any time soon"
+ ];
+
 // Constant
 const DIST_BETWEEN_TRAMPS = 100;
 const GAME_WIDTH = window.innerWidth;
@@ -40,8 +56,8 @@ var trampolinesJumped=0; //amount of trampolines jumped on, determines difficult
 var total_score = 0;
 
 //number of trampolines before the difficulty increases
-var TRAMPOLINES_PER_DIFFICULTY=10;
-var MAX_DIFFICULTY=2;
+const TRAMPOLINES_PER_DIFFICULTY=5;
+const MAX_DIFFICULTY=2;
 
 // Classes/Objects
 var waitingscreen;
@@ -51,9 +67,15 @@ var thePlayer;
 
 // Assets
 var characterImage;
+const CHARACTER_WIDTH=75;
+const CHARACTER_HEIGHT=75;
+
+var trampolineImage;
+const TRAMPOLINE_WIDTH=100;
+const TRAMPOLINE_HEIGHT=40;
+
 var hubotImage;
 var logo;
-
 
 class Player{
 	constructor(){
@@ -72,7 +94,8 @@ class Player{
 		var sinShenanigans = Math.abs(sin(Math.PI*frameCount/60)) * (GAME_HEIGHT-200);
 		thePlayer.ypos=GAME_HEIGHT-sinShenanigans;
 		// player sprite
-		image(characterImage,thePlayer.xpos, thePlayer.ypos-100, 75, 75);
+		image(characterImage,thePlayer.xpos, thePlayer.ypos-100,
+			CHARACTER_WIDTH,CHARACTER_HEIGHT);
 	}
 }
 
@@ -99,6 +122,7 @@ function setup()
 	characterImage = loadImage("assets/octocat.png");
 	hubotImage = loadImage("assets/hubot.jpg");
 	logo = loadImage("assets/title_logo.png");
+
 
 	// Initialize Classes
 	waitingscreen = new WaitingScreen(GAME_WIDTH,GAME_HEIGHT);
