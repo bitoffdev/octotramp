@@ -43,6 +43,23 @@ function Environment(height){
 		for (var i=0;i<this.trampolines.length;i++){
 			ellipse(this.trampolines[i]-this.scrollX, height-30,
 				TRAMPOLINE_WIDTH,TRAMPOLINE_HEIGHT);
+
+			// an attempt at removing trampolines that go off screen but I
+			// have no idea what I'm doing
+
+			// if(this.trampolines[i]-this.scrollX<-2*GAME_WIDTH){
+			// 	this.trampolines.pop(i);
+			// 	i--;
+			// }
 		}
+	}
+
+	/**
+	Returns the x position of the next trampoline
+
+	@return Xpos of the trampoline
+	*/
+	this.nextTrampolinePos=function(){
+		return this.trampolines[this.trampolines.length-1];
 	}
 }

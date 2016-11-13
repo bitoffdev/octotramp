@@ -133,6 +133,30 @@ function setup()
 	}
 }
 
+/**
+Draw an arrow pointing to the next trampoline.
+*/
+function drawArrow(){
+
+	var arrowLength=30;
+
+	var arrowX=thePlayer.xpos+(CHARACTER_WIDTH/2);
+	var arrowY=thePlayer.ypos-CHARACTER_HEIGHT-60;
+
+	var targetX=environment.nextTrampolinePos()-environment.scrollX
+	+(TRAMPOLINE_WIDTH/2);
+	var targetY=environment.height-30;
+
+	var adj=targetX-arrowX;
+	var opp=targetY-arrowY;
+
+	var arrowX2=arrowX+arrowLength*cos(opp/adj);
+	var arrowY2=arrowY+arrowLength*sin(opp/adj);
+
+	stroke(0,0,0);
+	line(arrowX,arrowY,arrowX2,arrowY2);
+}
+
 function drawTrampoline(){
 	var maxT=lastTrampolineSpot+difficulty;
 	var minT=lastTrampolineSpot-difficulty;
@@ -193,6 +217,7 @@ function draw() {
 		textAlign(CENTER);
 		text(LEADERBOARD_TITLE, LEADERBOARD_TITLE_XPOS, LEADERBOARD_TITLE_YPOS);
 
+		drawArrow();
 
 		// Generate the next trampoline each time the player touches the ground
 		if (frameCount%60 == 0){
