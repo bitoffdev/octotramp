@@ -9,8 +9,13 @@ function WaitingScreen(width, height){
 	this.game_title_pos = ((height/2)/2);
 	this.start_message_ypos = ((height/2)/2) + (((height/2)/2)/2);
 
+	this.pos = 0;
 
 	this.drawScreen = function(){
+		background(220,220,220);
+		var sinShenanigans = Math.abs(sin(Math.PI*frameCount/60)) * (this.height-300);
+		image(characterImage, 0, this.height-sinShenanigans);
+
 		fill(50);
 		textAlign(CENTER);
 

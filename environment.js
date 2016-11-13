@@ -28,7 +28,7 @@ function Environment(height){
 		this.translateX *= 0.75;
 		// Draw the environment
 		background(220,220,220);
-		noStroke();
+		//noStroke();
 		fill(color(156, 218, 239));
 		for (var i=0;i<this.trampolines.length;i++){
 			ellipse(this.trampolines[i]-this.scrollX, height-20, 100, 40);
