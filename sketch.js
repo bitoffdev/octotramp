@@ -22,11 +22,11 @@ const SUBTITLE_POS = ((GAME_HEIGHT/2)/2) + (((GAME_HEIGHT/2)/2)/1.6);
 const START_SPEED = 10;
 const SPEED_MODIFIER=1;
 
-const SCORE_HEIGHT = (((GAME_HEIGHT/2)/2)/2);
+const SCORE_HEIGHT = (GAME_HEIGHT/6);
 const SCORE_WIDTH = (GAME_WIDTH/2);
 
 const LEADERBOARD_XPOS = GAME_WIDTH - (GAME_WIDTH/5.5);
-const LEADERBOARD_YPOS = GAME_HEIGHT/30;
+const LEADERBOARD_YPOS = GAME_HEIGHT/5;
 const LEADERBOARD_X_SIZE = 200;
 const LEADERBOARD_TITLE = "Leaderboard";
 const LEADERBOARD_TITLE_XPOS = LEADERBOARD_XPOS + (LEADERBOARD_X_SIZE/2);
@@ -67,6 +67,7 @@ var githubFounderImage;
 
 var hubotImage;
 var logo;
+var githubBackgroundImage;
 
 class Player{
 	constructor(){
@@ -138,6 +139,7 @@ function setup()
 	rainbowImage=loadImage("assets/rainbow-straight.jpg");
 
 	githubFounderImage=loadImage("assets/some-loser.png")
+	githubBackgroundImage=loadImage("assets/github-homepage.jpg");
 
 
 	// Initialize Classes
@@ -255,13 +257,13 @@ function draw() {
 
 		// Display player's current score
 		textSize(START_MESSAGE_SIZE);
-		fill(0);
+		fill(255);
 		textAlign(CENTER);
 		text(SCORE, SCORE_WIDTH, SCORE_HEIGHT);
 		text(total_score, SCORE_WIDTH + 55, SCORE_HEIGHT);
 
 		// Display leaderboard
-		fill(color(156, 218, 239, 90));
+		fill(color(255, 255, 255, 90));
 		rect(LEADERBOARD_XPOS, LEADERBOARD_YPOS, 200, 250);
 		textSize(START_MESSAGE_SIZE);
 		fill(color(25, 82, 88));

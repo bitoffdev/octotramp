@@ -25,11 +25,14 @@ function Environment(height){
 	}
 
 	this.drawEnvironment = function(){
+
+		image(githubBackgroundImage,0,0,GAME_WIDTH,GAME_HEIGHT);
+
 		// Lerp the scrollX towards the targetX
 		this.scrollX += this.translateX * 0.25;
 		this.translateX *= 0.75;
 		// Draw the environment
-		background(220,220,220);
+		//background(220,220,220);
 		noStroke();
 		fill(color(160, 180, 160));
 		rect(0, height-20, GAME_WIDTH, 20);
