@@ -62,6 +62,8 @@ const TRAMPOLINE_WIDTH=100;
 const TRAMPOLINE_HEIGHT=40;
 
 var balloonImage;
+var rainbowImage;
+var githubFounderImage;
 
 var hubotImage;
 var logo;
@@ -132,6 +134,10 @@ function setup()
 
 	balloonImage=loadImage("assets/cute_balloon.jpg");
 	balloonX=3000;
+
+	rainbowImage=loadImage("assets/rainbow-straight.jpg");
+
+	githubFounderImage=loadImage("assets/some-loser.png")
 
 
 	// Initialize Classes
@@ -211,11 +217,19 @@ function drawTrampoline(){
 			difficulty++;
 			thePlayer.playerSpeed+=SPEED_MODIFIER;
 
-			//trigger inspirational quote
+
+			//trigger fun flashy Stuff based on jump count
+
 			spawnQuote();
 
-			if(trampolinesJumped%15==0)
+			if(trampolinesJumped%10==0)
 				spawnBalloon();
+			if(trampolinesJumped%15==0)
+				spawnRainbow();
+			if(trampolinesJumped%20==0)
+				spawnSeizure();
+			if(trampolinesJumped%25==0)
+				spawnFounder();
 		}
 		if(difficulty>MAX_DIFFICULTY)
 			difficulty=MAX_DIFFICULTY;
@@ -279,7 +293,9 @@ function draw() {
 
 		continueQuotes();
 		continueBalloon();
-
+		continueRainbow();
+		strobe();
+		continueFounder();
 	}
 }
 
