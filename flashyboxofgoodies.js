@@ -41,7 +41,23 @@ var activeQuotes=[];
 
 var balloonX=0;
 var balloonY=0;
+var balloonActive=false;
 
+var rainbowXs=[];
+var rainbowActive=false;
+const RAINBOW_WIDTH=1200;
+const RAINBOW_HEIGHT=100;
+const RAINBOW_ANGLE=45;
+const RAINBOW_SPEED=25;
+
+var strobeStart=0;
+var strobeActive=false;
+const STROBE_FRAMES=120;
+
+var founderX=0;
+var founderY=GAME_HEIGHT/2;
+var founderActive=false;
+var founderRotation=0;
 
 /**
 Creates a random quote from the list, and initializes it to float across the
@@ -137,15 +153,130 @@ function spawnBalloon(){
 	balloonX=0;
 	balloonY=start;
 
+	balloonActive=true;
 }
 
 /**
 Continues balloon animation in a circular pattern across the screen
 */
 function continueBalloon(){
+	if(!balloonActive)
+		return;
+
 	balloonX+=5;
 	var balloonXPos=(sin(3*frameCount/TIME_CONSTANT)+1)*100 + balloonX;
 	var balloonYPos=(cos(3*frameCount/TIME_CONSTANT)+1)*GAME_HEIGHT/2 - balloonY;
 
 	image(balloonImage,balloonXPos, balloonYPos,100,100);
+
+	if(balloonX>GAME_WIDTH)
+		ballonActive=false;
+}
+
+
+/**
+Trigger the rainbow animation
+*/
+function spawnRainbow(){
+	rainbowXs.push(-RAINBOW_WIDTH);
+	rainbowActive=true;
+}
+
+/**
+Have a rainbow fall through the screen diagonally, continuing through the top
+until the rainbow has reached the right side of the screen.
+*/
+function continueRainbow(){
+
+	if(!rainbowActive)
+		return;
+
+	push();
+
+	rotate(RAINBOW_ANGLE);
+
+	for(var i=0;i<rainbowXs.length;i++){
+		rainbowXs[i]+=RAINBOW_SPEED;
+		rainbowY=-2*i*RAINBOW_HEIGHT;
+		image(rainbowImage,rainbowXs[i],rainbowY,RAINBOW_WIDTH,RAINBOW_HEIGHT);
+
+
+	}
+
+	if(rainbowXs[rainbowXs.length-1]+RAINBOW_WIDTH>GAME_HEIGHT
+		&& rainbowXs.length*2*RAINBOW_HEIGHT < GAME_WIDTH)
+		rainbowXs.push(-RAINBOW_WIDTH);
+
+	if(rainbowXs[rainbowXs.length-1]>GAME_HEIGHT){
+		rainbowActive=false;
+
+		while(rainbowXs.length>0)
+			rainbowXs.pop(0);
+	}
+
+	pop();
+}
+
+/**
+Trigger the strobe effect
+*/
+function spawnSeizure(){
+	strobeStart=frameCount;
+	strobeActive=true;
+}
+
+/**
+Rapidly change the color of the screen for a strobe effect.
+The screen flickers for an amount of frames equal to STROBE_FRAMES, after which
+it stops.
+*/
+function strobe(){
+
+	if(!strobeActive)
+		return;
+
+	var r=int(Math.random()*255);
+	var g=int(Math.random()*255);
+	var b=int(Math.random()*255);
+
+	push();
+	fill(r,g,b,50);
+	rect(0,0,GAME_WIDTH,GAME_HEIGHT);
+	pop();
+
+	if(frameCount-strobeStart>STROBE_FRAMES)
+		strobeActive=false;
+}
+
+
+/**
+Trigger animation using a picture of github's founder
+*/
+function spawnFounder(){
+	founderX=0;
+	founderY=GAME_HEIGHT/2;
+	founderRotation=0;
+	founderActive=true;
+}
+
+/**
+Maintain a spinny animation of github's founder
+*/
+function continueFounder(){
+	if(!founderActive)
+		return;
+
+	push();
+
+	founderX+=20;
+	translate(founderX+100,founderY-100);
+	rotate(founderRotation);
+
+	founderRotation+=.5;
+
+	image(githubFounderImage,founderX,founderY,200,200);
+
+	if(founderX>GAME_WIDTH)
+		founderActive=false;
+	pop();
 }
