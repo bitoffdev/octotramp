@@ -8,21 +8,6 @@
  * @author Maximillian McMullen
  */
 
- var INSPIRATIONAL_STRINGS=[
-	 "Stay committed!",
-	 "When push comes to shove...",
-	 "git push your dreams... before they get crushed",
-	 "You can pull through!",
-	 "git checkout the high scores when you're done!",
-	 "If you don't do too well, you can always git reset!",
-	 "git show me what you've got",
-	 "It makes no diff to me",
-	 "At this rate, you're going to git add your name to the high scores!",
-	 "rm all your doubts!",
-	 "git fetch silly-quotes.git",
-	 "Keep mv'ing!",
-	 "The difficulty isn't going to revert any time soon"
- ];
 
 // Constant
 const DIST_BETWEEN_TRAMPS = 100;
@@ -168,6 +153,9 @@ function drawTrampoline(){
 		if(trampolinesJumped%TRAMPOLINES_PER_DIFFICULTY==0){
 			difficulty++;
 			thePlayer.playerSpeed+=SPEED_MODIFIER;
+
+			//trigger inspirational quote
+			spawnQuote();
 		}
 		if(difficulty>MAX_DIFFICULTY)
 			difficulty=MAX_DIFFICULTY;
@@ -211,11 +199,16 @@ function draw() {
 		// Generate the next trampoline each time the player touches the ground
 		if (frameCount%60 == 0){
 			var diff = environment.trampolines[environment.trampolines.length-1] - 40 - environment.scrollX - thePlayer.xpos;
+
 			if (diff < -60 || diff > 60){
 				gameState = 4; // game over
 			}
 			drawTrampoline();
 		}
+
+		// flashy effects
+
+		continueQuotes();
 	}
 }
 
