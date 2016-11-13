@@ -1,6 +1,7 @@
 LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
 
 function DeathScreen(){
+	this.submitted = false;
 	this.username = "";
 
 	this.drawDeathScreen = function(){
@@ -9,15 +10,20 @@ function DeathScreen(){
 		// Draw the logo
 		image(logo, 0, 0);
 		// Draw the text input
-		textAlign(CENTER);
-		textStyle(BOLD);
-		textSize(TITLE_SIZE);
-		text(this.username, GAME_WIDTH/2,GAME_HEIGHT/2)
+		if (!this.submitted){
+			fill(255);
+			textStyle(BOLD);
+			textSize(24);
+			text("Type your name:", GAME_WIDTH/2,GAME_HEIGHT/2-50);
+			textSize(32);
+			text(this.username, GAME_WIDTH/2,GAME_HEIGHT/2);
+		}
 	}
 
 	this.deathScreenKeyPressed = function() {
 		if (keyCode==RETURN || keyCode==ENTER){
 			//TODO submit the username and score to the server
+			location.reload(); // Go back to the loading screen
 		} else if (LETTERS.indexOf(key) > -1){
 			this.username = this.username + key;
 		}

@@ -57,9 +57,9 @@ var logo;
 
 class Player{
 	constructor(){
-		this.playerSpeed = 0;
+		this.playerSpeed = START_SPEED;
 		this.translateX = 0;
-		this.xpos=100;
+		this.xpos=GAME_WIDTH/2;
 		this.ypos=0;
 	}
 	drawPlayer(){
@@ -105,7 +105,6 @@ function setup()
 	deathscreen = new DeathScreen();
 	environment = new Environment(GAME_HEIGHT);
 	thePlayer = new Player();
-	thePlayer.xpos=GAME_WIDTH/2;
 
 	// find all valid trampoline spots
 	validSpots.push(thePlayer.xpos);
@@ -117,7 +116,6 @@ function setup()
 		validSpots.push(thePlayer.xpos-(i*DIST_BETWEEN_TRAMPS));
 		text(SCORE, this.width/2, this.start_message_ypos);
 	}
-	drawTrampoline();
 }
 
 function drawTrampoline(){
@@ -133,7 +131,7 @@ function drawTrampoline(){
 	environment.addTrampoline(pos+validSpots[spot]+40);
 
 	if(gameState > 0){
-		trampolinesJumped++;
+		trampolinesJumped++;total_score++;
 		if(trampolinesJumped%TRAMPOLINES_PER_DIFFICULTY==0){
 			difficulty++;
 			thePlayer.playerSpeed+=SPEED_MODIFIER;
@@ -145,8 +143,7 @@ function drawTrampoline(){
 	lastTrampolineSpot=spot;
 }
 
-function draw()
-{
+function draw() {
 	if (gameState==4){
 		deathscreen.drawDeathScreen();
 		return;
@@ -179,61 +176,44 @@ function draw()
 		// Generate the next trampoline each time the player touches the ground
 		if (frameCount%60 == 0){
 			var diff = environment.trampolines[environment.trampolines.length-1] - 40 - environment.scrollX - thePlayer.xpos;
-			console.log(diff);
-			if (diff < -60 || diff > 100){
-				gameOver();
+			if (diff < -60 || diff > 60){
+				gameState = 4; // game over
 			}
-			// console.log("Player: " + thePlayer.xpos);
-			// console.log("Tramp: " + (environment.trampolines[environment.trampolines.length-1] - environment.scrollX));
-
 			drawTrampoline();
 		}
 	}
 }
 
 /**
- * Change the Game's State
- */
-
-function pauseGame(){
-	if (gameState == 2){ // Pause State
-		gameState = 3; // Resume State
-	} else {
-		pauseFrame = frameCount;
-		gameState = 2; // Pause State
-	}
-}
-function gameOver(){
-	gameState = 4;
-}
-
-
-
-/**
  * Handle keyboard input.
  */
 function keyPressed(){
-	if(gameState == 0){
-		thePlayer.playerSpeed = START_SPEED;
-		gameState = 1;
-		drawTrampoline();
-		return;
-	} else if (gameState == 4){
-		deathscreen.deathScreenKeyPressed();
-		return;
-	}
-
-	switch(keyCode){
-		case LEFT_ARROW:
-			if(thePlayer.xpos-DIST_BETWEEN_TRAMPS>0)
-				thePlayer.translateX-=DIST_BETWEEN_TRAMPS;
+	switch(gameState){
+		case 0: // The game is just starting, reset everything
+			gameState = 1;
+			drawTrampoline();
 			break;
-		case RIGHT_ARROW:
-			if(thePlayer.xpos+DIST_BETWEEN_TRAMPS<GAME_WIDTH)
-				thePlayer.translateX+=DIST_BETWEEN_TRAMPS;
+		case 1:
+			switch(keyCode){
+				case LEFT_ARROW:
+					if(thePlayer.xpos-DIST_BETWEEN_TRAMPS>0)
+						thePlayer.translateX-=DIST_BETWEEN_TRAMPS;
+					break;
+				case RIGHT_ARROW:
+					if(thePlayer.xpos+DIST_BETWEEN_TRAMPS<GAME_WIDTH)
+						thePlayer.translateX+=DIST_BETWEEN_TRAMPS;
+					break;
+				case ESCAPE:
+					gameState = 2;
+					break;
+			}
 			break;
-		case ESCAPE:
-			pauseGame();
+		case 2: // The game is paused
+			if (keyCode==ESCAPE)
+				gameState = 3;
+			break;
+		case 4:
+			deathscreen.deathScreenKeyPressed();
 			break;
 	}
 }
