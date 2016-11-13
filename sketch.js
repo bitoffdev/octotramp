@@ -34,14 +34,6 @@ class Player{
 	}
 }
 
-// class Trampoline{
-// 	constructor(){
-// 		//trampoline width
-// 		this.size=15
-// 	}
-// }
-
-
 var thePlayer=new Player();
 var environment;
 
@@ -56,6 +48,7 @@ function setup()
 	characterImage = loadImage("assets/octocat.png");
 	image(characterImage, 0, 0);
 	environment = new Environment(10000,GAME_HEIGHT);
+	addNextTrampoline();
 }
 
 function drawBackground(){
@@ -63,6 +56,7 @@ function drawBackground(){
 	environment.drawEnvironment();
 
 	// Draw Chris' Stuff
+	fill(0);
 	text(START_MESSAGE, GAME_WIDTH/2, START_MESSAGE_YPOS);
 	textSize(GAME_TITLE_SIZE);
 	textAlign(CENTER);
@@ -73,9 +67,9 @@ function drawBackground(){
 	textAlign(CENTER);
 }
 
-function drawTrampoline(){
-	fill(0,255,0);
-	ellipse(nextSpot%GAME_WIDTH,GAME_HEIGHT,50,50);
+function addNextTrampoline(){
+	var pos = environment.scrollX + thePlayer.playerSpeed * (60 - frameCount%60);
+	environment.addTrampoline(pos + thePlayer.xpos);
 }
 
 function drawPlayer(){
@@ -84,25 +78,16 @@ function drawPlayer(){
 	var sinShenanigans = Math.abs(sin(Math.PI*frameCount/60)) * (GAME_HEIGHT-200);
 	thePlayer.ypos=GAME_HEIGHT-sinShenanigans;
 
+	// Generate the next trampoline each time the player touches the ground
 	if (frameCount%60 == 0){
-		var pos = environment.scrollX + thePlayer.playerSpeed * (60 - frameCount%60);
-		environment.addTrampoline(pos + thePlayer.xpos);
+		addNextTrampoline();
 	}
 
-
-	if(thePlayer.xpos>GAME_WIDTH){
-		thePlayer.xpos%=GAME_WIDTH;
-	}
-
-
-
-	// placeholder for player sprite
-	//fill(255, 0, 0);
-	image(characterImage,thePlayer.xpos, thePlayer.ypos-100, 75, 75);
+	image(characterImage,thePlayer.xpos, thePlayer.ypos-100);
 
 	// debug info
-	 fill(0);
-	 text("framerate = " + getFrameRate(), 25, 25);
+	//  fill(0);
+	//  text("framerate = " + getFrameRate(), 25, 25);
 }
 
 function increaseSpeed(){
@@ -114,7 +99,6 @@ function draw()
 {
 	drawBackground();
 	drawPlayer();
-	drawTrampoline();
 }
 
 /**
@@ -134,19 +118,14 @@ function keyPressed(){
 	switch(keyCode){
 		case LEFT_ARROW:
 			//thePlayer.xpos-=DIST_BETWEEN_TRAMPS;
-			environment.scrollX -= DIST_BETWEEN_TRAMPS;
+			environment.translateX -= DIST_BETWEEN_TRAMPS;
 			break;
 		case RIGHT_ARROW:
 			//thePlayer.xpos+=DIST_BETWEEN_TRAMPS;
-			environment.scrollX += DIST_BETWEEN_TRAMPS;
+			environment.translateX += DIST_BETWEEN_TRAMPS;
 				// if(thePlayer.playerSpeed > 0){
 				// 	thePlayer.playerSpeed-=SPEED_MODIFIER;
 				// }
-			break;
-		// case RIGHT_ARROW:
-		// 		thePlayer.playerSpeed+=SPEED_MODIFIER;
-		// 	break;
-		default:
 			break;
 	}
 }

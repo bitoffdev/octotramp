@@ -2,16 +2,21 @@
 function Environment(width, height){
 	this.trampolines = [];
 
-	this.scrollX = 0;
+	this.translateX = 0; // This value is used for arrow-key translation
+	this.scrollX = 0; // This value should be modified only with small increments
 
 	this.addTrampoline = function(x){
 		this.trampolines.push(x);
 	}
 
 	this.drawEnvironment = function(){
+		// Lerp the scrollX towards the targetX
+		this.scrollX += this.translateX * 0.25;
+		this.translateX *= 0.75;
+		// Draw the environment
 		background(220,220,220);
 		noStroke();
-		fill(color(0, 255, 0));
+		fill(color(156, 218, 239));
 		for (var i=0;i<this.trampolines.length;i++){
 			ellipse(this.trampolines[i]-this.scrollX, height-20, 100, 40);
 		}
