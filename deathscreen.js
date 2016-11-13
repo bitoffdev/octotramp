@@ -31,7 +31,7 @@ function DeathScreen(){
 	}
 
 	this.deathScreenKeyPressed = function() {
-		if (keyCode==RETURN || keyCode==ENTER){
+		if ((keyCode==RETURN || keyCode==ENTER) && this.username.length > 0){
 			$.ajax({url: "http://54.157.12.226:8000/?name=" + this.username + "&score=" + total_score,
 			    success: function(result){
               location.reload(); // Go back to the loading screen
