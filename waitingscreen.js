@@ -7,7 +7,7 @@ function WaitingScreen(width, height){
 	this.width = width;
 	this.height = height;
 	this.game_title_pos = ((height/2)/25);
-	this.start_message_ypos = ((height/2)/2) + (((height/2)/2)/1.6);
+	this.start_message_ypos = ((height/2)/2) + (height/2)+75;
 
 	this.pos = 0;
 
@@ -25,6 +25,6 @@ function WaitingScreen(width, height){
 		image(logo, (this.width/2.7), this.game_title_pos);
 
 		textSize(START_MESSAGE_SIZE);
-		text(START_MESSAGE, this.width/2, this.start_message_ypos);
+		text(START_MESSAGE, (this.width-(this.width/2)/3), this.start_message_ypos);
 	}
 }
