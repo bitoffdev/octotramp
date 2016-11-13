@@ -1,8 +1,12 @@
+// Define constants
 const GAME_TITLE = "OCTOTRAMP";
 const GAME_TITLE_SIZE = 32;
 const START_MESSAGE = "press any key to start";
 const START_MESSAGE_SIZE = 24;
 
+///@param width  the width of the display
+///@param height  the height of the display
+///
 function WaitingScreen(width, height){
 	this.width = width;
 	this.height = height;
