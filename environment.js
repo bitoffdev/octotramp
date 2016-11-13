@@ -13,6 +13,8 @@
  * @author Maximillian McMullen
  */
 function Environment(height){
+	this.height = height;
+
 	this.trampolines = [];
 
 	this.translateX = 0; // This value is used for arrow-key translation
@@ -29,9 +31,17 @@ function Environment(height){
 		// Draw the environment
 		background(220,220,220);
 		noStroke();
+		fill(color(160, 180, 160));
+		rect(0, height-20, GAME_WIDTH, 20);
+		// Draw the bases
+		fill(150);
+		for (var i=0;i<this.trampolines.length;i++){
+			rect(this.trampolines[i]-this.scrollX-50, height-20, 100, 40);
+		}
+		// Draw all the tampolines
 		fill(color(156, 218, 239));
 		for (var i=0;i<this.trampolines.length;i++){
-			ellipse(this.trampolines[i]-this.scrollX, height-20,
+			ellipse(this.trampolines[i]-this.scrollX, height-30,
 				TRAMPOLINE_WIDTH,TRAMPOLINE_HEIGHT);
 		}
 	}
