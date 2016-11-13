@@ -20,6 +20,16 @@ const SUBTITLE_POS = ((GAME_HEIGHT/2)/2) + (((GAME_HEIGHT/2)/2)/1.6);
 const START_SPEED = 10;
 const SPEED_MODIFIER=1;
 
+const SCORE_HEIGHT = (((GAME_HEIGHT/2)/2)/2);
+const SCORE_WIDTH = (GAME_WIDTH/2);
+
+const LEADERBOARD_XPOS = GAME_WIDTH - (GAME_WIDTH/5.5);
+const LEADERBOARD_YPOS = GAME_HEIGHT/30;
+const LEADERBOARD_X_SIZE = 200;
+const LEADERBOARD_TITLE = "Leaderboard";
+const LEADERBOARD_TITLE_XPOS = LEADERBOARD_XPOS + (LEADERBOARD_X_SIZE/2);
+const LEADERBOARD_TITLE_YPOS = LEADERBOARD_YPOS + 20;
+
 // State Variables
 var gameState = 0; // 0: Start Screen, 1: Play, 2: Paused, 3: Resuming, 4: Dead
 var pauseFrame = -1;
@@ -27,6 +37,7 @@ var validSpots=[]; //list of valid trampoline x positions
 var difficulty=0; //determines how far a trampoline can spawn from the center
 var maxTrampolinesFromCenter=0; //furthest from the center a trampoline can spawn (dependent on screen width)
 var trampolinesJumped=0; //amount of trampolines jumped on, determines difficulty
+var total_score = 0;
 
 //number of trampolines before the difficulty increases
 var TRAMPOLINES_PER_DIFFICULTY=10;
@@ -42,6 +53,7 @@ var thePlayer;
 var characterImage;
 var hubotImage;
 var logo;
+
 
 class Player{
 	constructor(){
@@ -77,11 +89,12 @@ var lastTrampolineSpot=0;
 var thePlayer=new Player();
 var environment;
 
+var SCORE = "Score: ";
+
 function setup()
 {
 	// set canvas size
 	createCanvas(GAME_WIDTH,GAME_HEIGHT);
-
 	// load images
 	characterImage = loadImage("assets/octocat.png");
 	hubotImage = loadImage("assets/hubot.jpg");
@@ -102,6 +115,7 @@ function setup()
 
 		validSpots.push(thePlayer.xpos+(i*DIST_BETWEEN_TRAMPS));
 		validSpots.push(thePlayer.xpos-(i*DIST_BETWEEN_TRAMPS));
+		text(SCORE, this.width/2, this.start_message_ypos);
 	}
 	drawTrampoline();
 }
@@ -146,6 +160,22 @@ function draw()
 	} else {
 		environment.drawEnvironment();
 		thePlayer.drawPlayer();
+		// Display player's current score
+		textSize(START_MESSAGE_SIZE);
+		fill(0);
+		textAlign(CENTER);
+		text(SCORE, SCORE_WIDTH, SCORE_HEIGHT);
+		text(total_score, SCORE_WIDTH + 55, SCORE_HEIGHT);
+
+		// Display leaderboard
+		fill(color(156, 218, 239, 90));
+		rect(LEADERBOARD_XPOS, LEADERBOARD_YPOS, 200, 250);
+		textSize(START_MESSAGE_SIZE);
+		fill(color(25, 82, 88));
+		textAlign(CENTER);
+		text(LEADERBOARD_TITLE, LEADERBOARD_TITLE_XPOS, LEADERBOARD_TITLE_YPOS);
+
+
 		// Generate the next trampoline each time the player touches the ground
 		if (frameCount%60 == 0){
 			var diff = environment.trampolines[environment.trampolines.length-1] - 40 - environment.scrollX - thePlayer.xpos;
