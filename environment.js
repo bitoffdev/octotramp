@@ -60,6 +60,6 @@ function Environment(height){
 	@return Xpos of the trampoline
 	*/
 	this.nextTrampolinePos=function(){
-		return this.trampolines[this.trampolines.length-1];
+		return this.trampolines[this.trampolines.length-2];
 	}
 }

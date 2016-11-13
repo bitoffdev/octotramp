@@ -181,8 +181,13 @@ function drawTrampoline(){
 	if(spot<0) spot=0;
 	if(spot>validSpots.length) spot=validSpots.length-1;
 
-	var pos = environment.scrollX + thePlayer.playerSpeed * (60 - frameCount%60);
-	environment.addTrampoline(pos+validSpots[spot]+40);
+	if (environment.trampolines.length == 0){
+		var pos = environment.scrollX + thePlayer.playerSpeed * (60 - frameCount%60);
+		environment.addTrampoline(pos+validSpots[spot]+40);
+	} else {
+		var lastTramp = environment.trampolines[environment.trampolines.length-1];
+		environment.addTrampoline(lastTramp + thePlayer.playerSpeed * 60);
+	}
 
 	if(gameState > 0){
 		trampolinesJumped++;total_score++;
@@ -244,15 +249,19 @@ function draw() {
 		drawArrow();
 
 		for (var i=0;i<leaders.length;i++){
-			text(leaders[i], LEADERBOARD_TITLE_XPOS, LEADERBOARD_TITLE_YPOS + i * 20);
+			text(leaders[i], LEADERBOARD_TITLE_XPOS, LEADERBOARD_TITLE_YPOS + i * 20 + 40);
 		}
-
 		// Generate the next trampoline each time the player touches the ground
 		if (frameCount%60 == 0){
-			var diff = environment.trampolines[environment.trampolines.length-1] - 40 - environment.scrollX - thePlayer.xpos;
-
+			// Trampolines are ellipses, which are anchored in the center by default.
+			// The player is an image, anchored by bottom left by default
+			// Trampoline Screen Position - Player Screen Position = Player Width / 2 = 37.5
+			var diff = environment.trampolines[environment.trampolines.length-2] - environment.scrollX - thePlayer.xpos - 37.5;
 			if (diff < -87.5 || diff > 87.5){
-				gameState = 4; // game over
+				var diff2 = environment.trampolines[environment.trampolines.length-1] - environment.scrollX - thePlayer.xpos - 37.5;
+				if (diff2 < -87.5 || diff2 > 87.5){
+					gameState = 4; // game over
+				}
 			}
 			drawTrampoline();
 		}
@@ -274,6 +283,7 @@ function keyPressed(){
 	switch(gameState){
 		case 0: // The game is just starting, reset everything
 			gameState = 1;
+			drawTrampoline();
 			drawTrampoline();
 			break;
 		case 1:
