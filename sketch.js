@@ -1,15 +1,18 @@
+/**
+ * sketch.js
+ *
+ * This is the main javascript file that is called by Processing.js
+ *
+ * @author Elliot Miller
+ * @author Chris Baudouin
+ * @author Maximillian McMullen
+ */
 
-//how much the player can modify their speed
-const SPEED_MODIFIER=1;
-
-//affects how sensitive the sin functions are since
-//the position is a function of sin and time
-const TIME_CONSTANT=500;
-
+// Constant
 const GAME_WIDTH=window.innerWidth;
 const GAME_HEIGHT=window.innerHeight;
-
 const DIST_BETWEEN_TRAMPS=100;
+
 const GAME_TITLE_YPOS = ((GAME_HEIGHT/2)/2);
 const GAME_TITLE = "OCTOTRAMP";
 const GAME_TITLE_SIZE = 32;
@@ -17,20 +20,30 @@ const START_MESSAGE = "press any key to start";
 const START_MESSAGE_YPOS = ((GAME_HEIGHT/2)/2) + (((GAME_HEIGHT/2)/2)/2);
 const START_MESSAGE_SIZE = 24;
 
-var DEFAULT_SPEED=5;
-var STARTING_SPEED = 0;
+const START_SPEED = 10;
 
+// State Variables
 var GAME_STARTED = 0;
+var validSpots=[]; //list of valid trampoline x positions
+var difficulty=0; //determines how far a trampoline can spawn from the center
+var maxTrampolinesFromCenter=0; //furthest from the center a trampoline can spawn (dependent on screen width)
+var trampolinesJumped=0; //amount of trampolines jumped on, determines difficulty
 
 //number of trampolines before the difficulty increases
 var TRAMPOLINES_PER_DIFFICULTY=10;
 var MAX_DIFFICULTY=2;
 
+// Classes/Objects
+var waitingscreen;
+var environment;
+var thePlayer;
+
+// Assets
 var characterImage;
 
 class Player{
 	constructor(){
-		this.playerSpeed=STARTING_SPEED;
+		this.playerSpeed = 0;
 		this.xpos=100;
 		this.ypos=0;
 	}
@@ -53,12 +66,15 @@ function setup()
 {
 	// set canvas size
 	createCanvas(GAME_WIDTH,GAME_HEIGHT);
-  // set canvas size
-  createCanvas(GAME_WIDTH,GAME_HEIGHT);
-	characterImage = loadImage("assets/octocat.png");
-	image(characterImage, 0, 0);
-	environment = new Environment(10000,GAME_HEIGHT);
 
+	// load images
+	characterImage = loadImage("assets/octocat.png");
+	trampolineImage = loadImage("assets/trampoline.png");
+
+	// Initialize Classes
+	waitingscreen = new WaitingScreen(GAME_WIDTH,GAME_HEIGHT);
+	environment = new Environment(GAME_HEIGHT);
+	thePlayer = new Player();
 	thePlayer.xpos=GAME_WIDTH/2;
 	thePlayer.ypos=0;
 
@@ -71,25 +87,7 @@ function setup()
 		validSpots.push(thePlayer.xpos+(i*DIST_BETWEEN_TRAMPS));
 		validSpots.push(thePlayer.xpos-(i*DIST_BETWEEN_TRAMPS));
 	}
-
 	drawTrampoline();
-	trampolineImage = loadImage("assets/trampoline.png");
-}
-
-function drawBackground(){
-	// Draw Environment
-	environment.drawEnvironment();
-
-	// Draw Chris' Stuff
-	text(START_MESSAGE, GAME_WIDTH/2, START_MESSAGE_YPOS);
-	textSize(GAME_TITLE_SIZE);
-	textAlign(CENTER);
-
-	text(GAME_TITLE, GAME_WIDTH/2, GAME_TITLE_YPOS);
-	textStyle(BOLD);
-	textSize(START_MESSAGE_SIZE);
-	textAlign(CENTER);
-
 }
 
 function drawTrampoline(){
@@ -127,33 +125,26 @@ function drawPlayer(){
 	image(characterImage,thePlayer.xpos, thePlayer.ypos-100, 75, 75);
 }
 
-function increaseSpeed(){
-	thePlayer.playerSpeed+=SPEED_MODIFIER;
-	console.log('speed increasing');
-}
-
 function draw()
 {
-	drawBackground();
-	drawPlayer();
-
-	if (frameCount%60 == 0){
-		drawTrampoline();
+	if (GAME_STARTED == 0){
+		waitingscreen.drawScreen();
+	} else {
+		environment.drawEnvironment();
+		drawPlayer();
+		// Generate the next trampoline each time the player touches the ground
+		if (frameCount%60 == 0){
+			drawTrampoline();
+		}
 	}
 }
 
 /**
-Handle keyboard input.
-
-Left arrow decreases speed, right arrow increases speed
-*/
+ * Handle keyboard input.
+ */
 function keyPressed(){
 	if(GAME_STARTED == 0){
-		thePlayer.playerSpeed = DEFAULT_SPEED;
-		text(START_MESSAGE, GAME_WIDTH/2, START_MESSAGE_YPOS);
-		textSize(GAME_TITLE_SIZE);
-		textAlign(CENTER);
-		fill(220,220,220);
+		thePlayer.playerSpeed = START_SPEED;
 		GAME_STARTED = 1;
 		drawTrampoline();
 		return;
@@ -167,8 +158,6 @@ function keyPressed(){
 		case RIGHT_ARROW:
 			if(thePlayer.xpos+DIST_BETWEEN_TRAMPS<GAME_WIDTH)
 				thePlayer.xpos+=DIST_BETWEEN_TRAMPS;
-			break;
-		default:
 			break;
 	}
 }
