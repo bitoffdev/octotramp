@@ -13,14 +13,8 @@ const GAME_WIDTH=window.innerWidth;
 const GAME_HEIGHT=window.innerHeight;
 const DIST_BETWEEN_TRAMPS=100;
 
-const GAME_TITLE_YPOS = ((GAME_HEIGHT/2)/2);
-const GAME_TITLE = "OCTOTRAMP";
-const GAME_TITLE_SIZE = 32;
-const START_MESSAGE = "press any key to start";
-const START_MESSAGE_YPOS = ((GAME_HEIGHT/2)/2) + (((GAME_HEIGHT/2)/2)/2);
-const START_MESSAGE_SIZE = 24;
-
 const START_SPEED = 10;
+const SPEED_MODIFIER=1;
 
 // State Variables
 var GAME_STARTED = 0;
