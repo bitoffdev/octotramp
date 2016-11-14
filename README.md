@@ -1,6 +1,6 @@
 # octotramp
 
-2016 hackRIT
+2016 hackRPI
 
 ## Running locally
 
