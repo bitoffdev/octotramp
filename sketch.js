@@ -71,6 +71,7 @@ function setup()
 	}
 
 	drawTrampoline();
+	trampolineImage = loadImage("assets/trampoline.png");
 }
 
 function drawBackground(){
@@ -86,10 +87,10 @@ function drawBackground(){
 	textStyle(BOLD);
 	textSize(START_MESSAGE_SIZE);
 	textAlign(CENTER);
+
 }
 
 function drawTrampoline(){
-
 	var spot=validSpots[int(Math.random()*difficulty)];
 
 	var pos = environment.scrollX + thePlayer.playerSpeed * (60 - frameCount%60);
