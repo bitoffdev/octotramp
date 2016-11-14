@@ -6,8 +6,8 @@ const SPEED_MODIFIER=1;
 //the position is a function of sin and time
 const TIME_CONSTANT=500;
 
-const GAME_WIDTH=640;
-const GAME_HEIGHT=480;
+const GAME_WIDTH=window.innerWidth;
+const GAME_HEIGHT=window.innerHeight;
 
 const DIST_BETWEEN_TRAMPS=100;
 const GAME_TITLE_YPOS = ((GAME_HEIGHT/2)/2);
@@ -22,9 +22,10 @@ var STARTING_SPEED = 0;
 
 var GAME_STARTED = 0;
 
-var characterImage;
+//number of trampolines before the difficulty increases
+var TRAMPOLINES_PER_DIFFICULTY=2;
 
-var nextSpot=0;
+var characterImage;
 
 class Player{
 	constructor(){
@@ -34,18 +35,17 @@ class Player{
 	}
 }
 
-// class Trampoline{
-// 	constructor(){
-// 		//trampoline width
-// 		this.size=15
-// 	}
-// }
-
+//list of valid trampoline x positions
+var validSpots=[];
+//determines how far a trampoline can spawn from the center
+var difficulty=0;
+//furthest from the center a trampoline can spawn (dependent on screen width)
+var maxTrampolinesFromCenter=0;
+//amount of trampolines jumped on, determines difficulty
+var trampolinesJumped=0;
 
 var thePlayer=new Player();
 var environment;
-
-
 
 function setup()
 {
@@ -56,6 +56,21 @@ function setup()
 	characterImage = loadImage("assets/octocat.png");
 	image(characterImage, 0, 0);
 	environment = new Environment(10000,GAME_HEIGHT);
+
+	thePlayer.xpos=GAME_WIDTH/2;
+	thePlayer.ypos=0;
+
+	// find all valid trampoline spots
+	validSpots.push(thePlayer.xpos);
+	for(var i=1;;i++){
+		if(thePlayer.xpos+(i*DIST_BETWEEN_TRAMPS)>GAME_WIDTH)
+			break;
+
+		validSpots.push(thePlayer.xpos+(i*DIST_BETWEEN_TRAMPS));
+		validSpots.push(thePlayer.xpos-(i*DIST_BETWEEN_TRAMPS));
+	}
+
+	drawTrampoline();
 }
 
 function drawBackground(){
@@ -74,8 +89,17 @@ function drawBackground(){
 }
 
 function drawTrampoline(){
-	fill(0,255,0);
-	ellipse(nextSpot%GAME_WIDTH,GAME_HEIGHT,50,50);
+
+	var spot=validSpots[int(Math.random()*difficulty)];
+
+	var pos = environment.scrollX + thePlayer.playerSpeed * (60 - frameCount%60);
+	environment.addTrampoline(pos+spot + 40);
+
+	if(GAME_STARTED){
+		trampolinesJumped++;
+		if(trampolinesJumped%TRAMPOLINES_PER_DIFFICULTY==0)
+			difficulty++;
+	}
 }
 
 function drawPlayer(){
@@ -84,25 +108,8 @@ function drawPlayer(){
 	var sinShenanigans = Math.abs(sin(Math.PI*frameCount/60)) * (GAME_HEIGHT-200);
 	thePlayer.ypos=GAME_HEIGHT-sinShenanigans;
 
-	if (frameCount%60 == 0){
-		var pos = environment.scrollX + thePlayer.playerSpeed * (60 - frameCount%60);
-		environment.addTrampoline(pos + thePlayer.xpos);
-	}
-
-
-	if(thePlayer.xpos>GAME_WIDTH){
-		thePlayer.xpos%=GAME_WIDTH;
-	}
-
-
-
-	// placeholder for player sprite
-	//fill(255, 0, 0);
+	//player sprite
 	image(characterImage,thePlayer.xpos, thePlayer.ypos-100, 75, 75);
-
-	// debug info
-	 fill(0);
-	 text("framerate = " + getFrameRate(), 25, 25);
 }
 
 function increaseSpeed(){
@@ -114,7 +121,10 @@ function draw()
 {
 	drawBackground();
 	drawPlayer();
-	drawTrampoline();
+
+	if (frameCount%60 == 0){
+		drawTrampoline();
+	}
 }
 
 /**
@@ -130,22 +140,19 @@ function keyPressed(){
 		textAlign(CENTER);
 		fill(220,220,220);
 		GAME_STARTED = 1;
+		drawTrampoline();
+		return;
 	}
+
 	switch(keyCode){
 		case LEFT_ARROW:
-			//thePlayer.xpos-=DIST_BETWEEN_TRAMPS;
-			environment.scrollX -= DIST_BETWEEN_TRAMPS;
+			if(thePlayer.xpos-DIST_BETWEEN_TRAMPS>0)
+				thePlayer.xpos-=DIST_BETWEEN_TRAMPS;
 			break;
 		case RIGHT_ARROW:
-			//thePlayer.xpos+=DIST_BETWEEN_TRAMPS;
-			environment.scrollX += DIST_BETWEEN_TRAMPS;
-				// if(thePlayer.playerSpeed > 0){
-				// 	thePlayer.playerSpeed-=SPEED_MODIFIER;
-				// }
+			if(thePlayer.xpos+DIST_BETWEEN_TRAMPS<GAME_WIDTH)
+				thePlayer.xpos+=DIST_BETWEEN_TRAMPS;
 			break;
-		// case RIGHT_ARROW:
-		// 		thePlayer.playerSpeed+=SPEED_MODIFIER;
-		// 	break;
 		default:
 			break;
 	}
