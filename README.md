@@ -1,4 +1,4 @@
-# octotramp
+# OctoTramp
 
 2016 hackRPI
 
