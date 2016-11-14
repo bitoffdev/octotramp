@@ -17,13 +17,14 @@ const START_MESSAGE = "press any key to start";
 const START_MESSAGE_YPOS = ((GAME_HEIGHT/2)/2) + (((GAME_HEIGHT/2)/2)/2);
 const START_MESSAGE_SIZE = 24;
 
-var DEFAULT_SPEED=10;
+var DEFAULT_SPEED=5;
 var STARTING_SPEED = 0;
 
 var GAME_STARTED = 0;
 
 //number of trampolines before the difficulty increases
-var TRAMPOLINES_PER_DIFFICULTY=2;
+var TRAMPOLINES_PER_DIFFICULTY=10;
+var MAX_DIFFICULTY=2;
 
 var characterImage;
 
@@ -43,6 +44,7 @@ var difficulty=0;
 var maxTrampolinesFromCenter=0;
 //amount of trampolines jumped on, determines difficulty
 var trampolinesJumped=0;
+var lastTrampolineSpot=0;
 
 var thePlayer=new Player();
 var environment;
@@ -91,16 +93,28 @@ function drawBackground(){
 }
 
 function drawTrampoline(){
-	var spot=validSpots[int(Math.random()*difficulty)];
+	var maxT=lastTrampolineSpot+difficulty;
+	var minT=lastTrampolineSpot-difficulty;
+
+	var spot=minT+int(Math.random()*(maxT-minT));
+
+	if(spot<0) spot=0;
+	if(spot>validSpots.length) spot=validSpots.length-1;
 
 	var pos = environment.scrollX + thePlayer.playerSpeed * (60 - frameCount%60);
-	environment.addTrampoline(pos+spot + 40);
+	environment.addTrampoline(pos+validSpots[spot] + 40);
 
 	if(GAME_STARTED){
 		trampolinesJumped++;
-		if(trampolinesJumped%TRAMPOLINES_PER_DIFFICULTY==0)
+		if(trampolinesJumped%TRAMPOLINES_PER_DIFFICULTY==0){
 			difficulty++;
+			thePlayer.playerSpeed+=SPEED_MODIFIER;
+		}
+		if(difficulty>MAX_DIFFICULTY)
+			difficulty=MAX_DIFFICULTY;
 	}
+
+	lastTrampolineSpot=spot;
 }
 
 function drawPlayer(){
