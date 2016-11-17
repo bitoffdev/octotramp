@@ -25,14 +25,12 @@ function Environment(height){
 	}
 
 	this.drawEnvironment = function(){
-
-		image(githubBackgroundImage,0,0,GAME_WIDTH,GAME_HEIGHT);
-
 		// Lerp the scrollX towards the targetX
 		this.scrollX += this.translateX * 0.25;
 		this.translateX *= 0.75;
 		// Draw the environment
-		//background(220,220,220);
+		//image(githubBackgroundImage,0,0,GAME_WIDTH,GAME_HEIGHT);
+		background(220,220,220);
 		noStroke();
 		fill(color(160, 180, 160));
 		rect(0, height-20, GAME_WIDTH, 20);
@@ -46,15 +44,11 @@ function Environment(height){
 		for (var i=0;i<this.trampolines.length;i++){
 			ellipse(this.trampolines[i]-this.scrollX, height-30,
 				TRAMPOLINE_WIDTH,TRAMPOLINE_HEIGHT);
-
-			// an attempt at removing trampolines that go off screen but I
-			// have no idea what I'm doing
-
-			// if(this.trampolines[i]-this.scrollX<-2*GAME_WIDTH){
-			// 	this.trampolines.pop(i);
-			// 	i--;
-			// }
 		}
+		// Prune trampolines that went off the screen
+		// if (this.trampolines[0] < this.scrollX - DIST_BETWEEN_TRAMPS) {
+		// 	this.trampolines.shift();
+		// }
 	}
 
 	/**

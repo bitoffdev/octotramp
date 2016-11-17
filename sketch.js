@@ -10,7 +10,7 @@
 
 
 // Constant
-const TIME_CONSTANT=60;
+const TIME_CONSTANT=55; // number of frames per jump
 const DIST_BETWEEN_TRAMPS = 100;
 const GAME_WIDTH = window.innerWidth;
 const GAME_HEIGHT = window.innerHeight;
@@ -18,33 +18,37 @@ const TITLE_SIZE = 32;
 const TITLE_POS = GAME_HEIGHT/2;
 const SUBTITLE_SIZE = 24;
 const SUBTITLE_POS = ((GAME_HEIGHT/2)/2) + (((GAME_HEIGHT/2)/2)/1.6);
+const TRAMPOLINES_PER_DIFFICULTY=5;
+const MAX_DIFFICULTY=2;
 
-const START_SPEED = 10;
-const SPEED_MODIFIER=1;
+const START_SPEED = 8;
+const SPEED_MODIFIER = 0.6;
 
+const SCORE = "Score: ";
 const SCORE_HEIGHT = (GAME_HEIGHT/6);
 const SCORE_WIDTH = (GAME_WIDTH/2);
 
 const LEADERBOARD_XPOS = GAME_WIDTH - (GAME_WIDTH/5.5);
-const LEADERBOARD_YPOS = GAME_HEIGHT/5;
+const LEADERBOARD_YPOS = 50;
 const LEADERBOARD_X_SIZE = 200;
 const LEADERBOARD_TITLE = "Leaderboard";
 const LEADERBOARD_TITLE_XPOS = LEADERBOARD_XPOS + (LEADERBOARD_X_SIZE/2);
 const LEADERBOARD_TITLE_YPOS = LEADERBOARD_YPOS + 20;
 
+const CHARACTER_WIDTH=80;
+const CHARACTER_HEIGHT=80;
+
+const TRAMPOLINE_WIDTH=100;
+const TRAMPOLINE_HEIGHT=40;
+
 // State Variables
+var totalOffset = 0; // The sum of all offset movements
 var gameState = 0; // 0: Start Screen, 1: Play, 2: Paused, 3: Resuming, 4: Dead
 var pauseFrame = -1;
-var validSpots=[]; //list of valid trampoline x positions
 var difficulty=0; //determines how far a trampoline can spawn from the center
-var maxTrampolinesFromCenter=0; //furthest from the center a trampoline can spawn (dependent on screen width)
-var trampolinesJumped=0; //amount of trampolines jumped on, determines difficulty
+var trampolinesPlaced=0; //amount of trampolines jumped on, determines difficulty
 var total_score = 0;
 var leaders = [];
-
-//number of trampolines before the difficulty increases
-const TRAMPOLINES_PER_DIFFICULTY=5;
-const MAX_DIFFICULTY=2;
 
 // Classes/Objects
 var waitingscreen;
@@ -54,17 +58,10 @@ var thePlayer;
 
 // Assets
 var characterImage;
-const CHARACTER_WIDTH=80;
-const CHARACTER_HEIGHT=80;
-
 var trampolineImage;
-const TRAMPOLINE_WIDTH=100;
-const TRAMPOLINE_HEIGHT=40;
-
 var balloonImage;
 var rainbowImage;
 var githubFounderImage;
-
 var hubotImage;
 var logo;
 var githubBackgroundImage;
@@ -109,21 +106,6 @@ class Player{
 	}
 }
 
-//list of valid trampoline x positions
-var validSpots=[];
-//determines how far a trampoline can spawn from the center
-var difficulty=0;
-//furthest from the center a trampoline can spawn (dependent on screen width)
-var maxTrampolinesFromCenter=0;
-//amount of trampolines jumped on, determines difficulty
-var trampolinesJumped=0;
-var lastTrampolineSpot=0;
-
-var thePlayer=new Player();
-var environment;
-
-var SCORE = "Score: ";
-
 function setup()
 {
 	// set canvas size
@@ -148,18 +130,8 @@ function setup()
 	environment = new Environment(GAME_HEIGHT);
 	thePlayer = new Player();
 
-	// find all valid trampoline spots
-	validSpots.push(thePlayer.xpos);
-	for(var i=1;;i++){
-		if(thePlayer.xpos+(i*DIST_BETWEEN_TRAMPS)>GAME_WIDTH)
-			break;
-
-		validSpots.push(thePlayer.xpos+(i*DIST_BETWEEN_TRAMPS));
-		validSpots.push(thePlayer.xpos-(i*DIST_BETWEEN_TRAMPS));
-		text(SCORE, this.width/2, this.start_message_ypos);
-	}
 	// Load the leaderboard
-	$.ajax({url: "http://54.157.12.226:8000",
+	$.ajax({url: "leaderboard",
 			success: function(result){
 				var listings = result.split("\n");
 				for (var i=0;i<listings.length;i++){
@@ -192,52 +164,55 @@ function drawArrow(){
 	line(arrowX,arrowY,arrowX2,arrowY2);
 }
 
-function drawTrampoline(){
-	var maxT=lastTrampolineSpot+difficulty;
-	var minT=lastTrampolineSpot-difficulty;
-
-	var spot=minT+int(Math.random()*(maxT-minT));
-
-	if(spot<0) spot=0;
-	if(spot>validSpots.length) spot=validSpots.length-1;
-
-	if (environment.trampolines.length == 0){
-		var pos = environment.scrollX + thePlayer.playerSpeed * (60 - frameCount%60);
-		environment.addTrampoline(pos+validSpots[spot]+40);
+function placeTrampoline(){
+	trampolinesPlaced++;
+	var scrollPlayer = environment.scrollX + thePlayer.xpos + CHARACTER_WIDTH/2;
+	// Calculate where the player will hit after the last trampoline placed
+	if (trampolinesPlaced==1){
+		var scrollHit = scrollPlayer + thePlayer.playerSpeed * (TIME_CONSTANT - frameCount%TIME_CONSTANT);
 	} else {
-		var lastTramp = environment.trampolines[environment.trampolines.length-1];
-		environment.addTrampoline(lastTramp + thePlayer.playerSpeed * 60);
+		var scrollHit = environment.trampolines[environment.trampolines.length-1] + TIME_CONSTANT * thePlayer.playerSpeed;
 	}
+	// Adjust trampolines for changes in speed
+	var jumpsBefore = (scrollHit - scrollPlayer) / (TIME_CONSTANT * thePlayer.playerSpeed);
+	if (trampolinesPlaced%5==0 ||trampolinesPlaced%5 + jumpsBefore > 5.5){
+		scrollHit += (SPEED_MODIFIER * TIME_CONSTANT);
+	}
+	// Calculate the total score
+	total_score = trampolinesPlaced - int(jumpsBefore);
+	// Get random offset based on difficulty
+	var offset = DIST_BETWEEN_TRAMPS * (int(Math.random() * (2 * difficulty + 1)) - difficulty);
+	// Prevent offsets from flying to far off the center
+	if (totalOffset < -300 || totalOffset > 300){offset=-offset;}
+	totalOffset += offset;
+	// Put it all together and add the trampoline
+	environment.addTrampoline(scrollHit + offset);
+}
 
-	if(gameState > 0){
-		if (total_score%10==6){
+function drawTrampoline(){
+
+	placeTrampoline();
+
+	// Increase the difficulty every 5 trampolines placed
+	if(trampolinesPlaced%TRAMPOLINES_PER_DIFFICULTY==0){
+		difficulty += difficulty<MAX_DIFFICULTY ? 1 : 0;
+		thePlayer.playerSpeed+=SPEED_MODIFIER;
+
+		//trigger fun flashy Stuff based on jump count
+		spawnQuote();
+		if(trampolinesPlaced%10==0)
+			spawnBalloon();
+		if(trampolinesPlaced%15==0)
+			spawnRainbow();
+		if(trampolinesPlaced%20==0)
+			spawnSeizure();
+		if(trampolinesPlaced%25==0)
+			spawnFounder();
+		if(trampolinesPlaced%5==0){
 			thePlayer.rot = 2*PI;
 			thePlayer.anim = thePlayer.anim==0 ? 1 : 0;
 		}
-		trampolinesJumped++;total_score++;
-		if(trampolinesJumped%TRAMPOLINES_PER_DIFFICULTY==0){
-			difficulty++;
-			thePlayer.playerSpeed+=SPEED_MODIFIER;
-
-
-			//trigger fun flashy Stuff based on jump count
-
-			spawnQuote();
-
-			if(trampolinesJumped%10==0)
-				spawnBalloon();
-			if(trampolinesJumped%15==0)
-				spawnRainbow();
-			if(trampolinesJumped%20==0)
-				spawnSeizure();
-			if(trampolinesJumped%25==0)
-				spawnFounder();
-		}
-		if(difficulty>MAX_DIFFICULTY)
-			difficulty=MAX_DIFFICULTY;
 	}
-
-	lastTrampolineSpot=spot;
 }
 
 function draw() {
@@ -248,56 +223,58 @@ function draw() {
 	if (gameState == 0){
 		waitingscreen.drawScreen();
 	} else if (pauseFrame > -1) {
-		if (gameState == 3 && frameCount%60==pauseFrame%60){ // If Resume State
+		if (gameState == 3 && frameCount%TIME_CONSTANT==pauseFrame%TIME_CONSTANT){ // If Resume State
 			pauseFrame = -1;
 		}
 	} else {
 		environment.drawEnvironment();
+		var scrollHit = thePlayer.xpos + CHARACTER_WIDTH/2 + thePlayer.playerSpeed * (TIME_CONSTANT - frameCount%TIME_CONSTANT);
+		noStroke();
+		fill(color(255,0,0));
+		rect(scrollHit-DIST_BETWEEN_TRAMPS/2+thePlayer.playerSpeed, GAME_HEIGHT-3, DIST_BETWEEN_TRAMPS, 4);
 		thePlayer.drawPlayer();
 
-		// Display player's current score
-		textSize(START_MESSAGE_SIZE);
-		fill(255);
-		textAlign(CENTER);
-		text(SCORE, SCORE_WIDTH, SCORE_HEIGHT);
-		text(total_score, SCORE_WIDTH + 55, SCORE_HEIGHT);
-
-		// Display leaderboard
+		// Draw the leaderboard box
 		fill(color(255, 255, 255, 90));
-		rect(LEADERBOARD_XPOS, LEADERBOARD_YPOS, 200, 250);
-		textSize(START_MESSAGE_SIZE);
+		rect(GAME_WIDTH - 300, 50, 250, 300);
+		// Style the text
+		textStyle(NORMAL);
+		textSize(20);
 		fill(color(25, 82, 88));
 		textAlign(CENTER);
-		text(LEADERBOARD_TITLE, LEADERBOARD_TITLE_XPOS, LEADERBOARD_TITLE_YPOS);
-
-		drawArrow();
-
+		// Display leaderboard
+		text(LEADERBOARD_TITLE, GAME_WIDTH-175, 70);
+		// List leaders
 		textAlign(RIGHT);
 		for (var i=0;i<leaders.length;i++){
-			text(leaders[i], LEADERBOARD_XPOS + 200, LEADERBOARD_TITLE_YPOS + i * 20 + 40);
+			text(leaders[i], GAME_WIDTH - 60, 70 + i * 22 + 40);
 		}
-		// Generate the next trampoline each time the player touches the ground
-		if (frameCount%60 == 0){
-			// Trampolines are ellipses, which are anchored in the center by default.
-			// The player is an image, anchored by bottom left by default
-			// Trampoline Screen Position - Player Screen Position = Player Width / 2 = 37.5
-			var diff = environment.trampolines[environment.trampolines.length-2] - environment.scrollX - thePlayer.xpos - CHARACTER_WIDTH/2;
-			if (Math.abs(diff) > CHARACTER_WIDTH/2 + TRAMPOLINE_WIDTH){
-				var diff2 = environment.trampolines[environment.trampolines.length-1] - environment.scrollX - thePlayer.xpos - CHARACTER_WIDTH/2;
-				if (Math.abs(diff2) > CHARACTER_WIDTH/2 + TRAMPOLINE_WIDTH){
-					gameState = 4; // game over
-				}
-			}
-			drawTrampoline();
-		}
+		// Display player's current score
+		text("Score: " + total_score, GAME_WIDTH - 60, 380);
 
 		// flashy effects
-
 		continueQuotes();
 		continueBalloon();
 		continueRainbow();
 		strobe();
 		continueFounder();
+
+		// Generate the next trampoline each time the player touches the ground
+		if (frameCount%TIME_CONSTANT == 0){
+			// Trampolines are ellipses, which are anchored in the center by default.
+			// The player is an image, anchored by bottom left by default
+			// Trampoline Screen Position - Player Screen Position = Player Width / 2 = 37.5
+			var offset = environment.scrollX + thePlayer.xpos + CHARACTER_WIDTH/2;
+			for (var i=0;i<environment.trampolines.length;i++){
+				var diff = environment.trampolines[i] - offset;
+				if (Math.abs(diff) < CHARACTER_WIDTH){ // less forgiving because of improved targeting
+					drawTrampoline();
+					return;
+				}
+			}
+			// If we didn't bounce, end game
+			gameState = 4;
+		}
 	}
 }
 
@@ -310,6 +287,7 @@ function keyPressed(){
 			gameState = 1;
 			drawTrampoline();
 			drawTrampoline();
+			//drawTrampoline();
 			break;
 		case 1:
 			switch(keyCode){
