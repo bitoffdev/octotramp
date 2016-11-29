@@ -1,0 +1,18 @@
+CACHE MANIFEST
+# Updated: 2016-11-29
+
+CACHE:
+/assets/cute_balloon.jpg
+/assets/github-homepage.jpg
+/assets/hubot.jpg
+/assets/octocat.png
+/assets/rainbow-straight.jpg
+/assets/some-loser.png
+/assets/title_logo.png
+/assets/trampoline.png
+
+/libraries/p5.js
+
+
+NETWORK:
+*
