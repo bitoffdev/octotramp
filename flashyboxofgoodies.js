@@ -99,7 +99,7 @@ function spawnQuote(){
 		activeQuote.direction="down";
 	}
 
-	console.log("x="+activeQuote.x+" y="+activeQuote.y+" dir="+activeQuote.direction);
+	//console.log("x="+activeQuote.x+" y="+activeQuote.y+" dir="+activeQuote.direction);
 
 	activeQuotes.push(activeQuote);
 }
@@ -164,8 +164,8 @@ function continueBalloon(){
 		return;
 
 	balloonX+=5;
-	var balloonXPos=(sin(3*frameCount/TIME_CONSTANT)+1)*100 + balloonX;
-	var balloonYPos=(cos(3*frameCount/TIME_CONSTANT)+1)*GAME_HEIGHT/2 - balloonY;
+	var balloonXPos=(sin(3*frameCount/jumpDuration)+1)*100 + balloonX;
+	var balloonYPos=(cos(3*frameCount/jumpDuration)+1)*GAME_HEIGHT/2 - balloonY;
 
 	image(balloonImage,balloonXPos, balloonYPos,100,100);
 
