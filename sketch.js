@@ -125,7 +125,7 @@ function setup()
 function drawLeaderboard(){
 	// Draw the leaderboard box
 	fill(color(255, 255, 255, 90));
-	rect(GAME_WIDTH - 300, 50, 250, 300);
+	rect(GAME_WIDTH - 300, 50, 250, 400);
 	// Style the text
 	textStyle(NORMAL);
 	textSize(20);
@@ -139,7 +139,7 @@ function drawLeaderboard(){
 		text(leaders[i], GAME_WIDTH - 60, 70 + i * 22 + 40);
 	}
 	// Display player's current score
-	text("Score: " + total_score, GAME_WIDTH - 60, 380);
+	text("Score: " + total_score, GAME_WIDTH - 60, 480);
 }
 
 function bounce(){

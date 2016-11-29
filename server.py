@@ -22,7 +22,7 @@ def load_scores():
 
 def get_leaderboard():
     """Returns a print-friendly string of the top 10 on the leaderboard"""
-    return bytes("\n".join(map(lambda x: "%s%4d"%x, scores[:10])), "utf-8")
+    return bytes("\n".join(map(lambda x: "%s%4d"%x, scores[:15])), "utf-8")
 
 def save_score(name, score):
     """Inserts a name-score tuple to the ordered scores list and records all
