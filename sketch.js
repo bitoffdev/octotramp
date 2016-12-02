@@ -317,7 +317,15 @@ function keyPressed(){
 					if(thePlayer.xpos-DIST_BETWEEN_TRAMPS>0)
 						thePlayer.translateX-=DIST_BETWEEN_TRAMPS;
 					break;
+				case A:
+					if(thePlayer.xpos-DIST_BETWEEN_TRAMPS>0)
+						thePlayer.translateX-=DIST_BETWEEN_TRAMPS;
+					break;
 				case RIGHT_ARROW:
+					if(thePlayer.xpos+DIST_BETWEEN_TRAMPS<GAME_WIDTH)
+						thePlayer.translateX+=DIST_BETWEEN_TRAMPS;
+					break;
+				case D:
 					if(thePlayer.xpos+DIST_BETWEEN_TRAMPS<GAME_WIDTH)
 						thePlayer.translateX+=DIST_BETWEEN_TRAMPS;
 					break;
