@@ -103,13 +103,13 @@ function setup()
 	// set canvas size
 	createCanvas(GAME_WIDTH,GAME_HEIGHT);
 	// load images
-	characterImage = loadImage("assets/octocat.png");
-	hubotImage = loadImage("assets/hubot.jpg");
-	logo = loadImage("assets/title_logo.png");
-	rainbowImage = loadImage("assets/rainbow-straight.jpg");
-	githubFounderImage = loadImage("assets/some-loser.png")
-	githubBackgroundImage = loadImage("assets/github-homepage.jpg");
-	balloonImage = loadImage("assets/cute_balloon.jpg");
+	characterImage = loadImage("static/assets/octocat.png");
+	hubotImage = loadImage("static/assets/hubot.jpg");
+	logo = loadImage("static/assets/title_logo.png");
+	rainbowImage = loadImage("static/assets/rainbow-straight.jpg");
+	githubFounderImage = loadImage("static/assets/some-loser.png")
+	githubBackgroundImage = loadImage("static/assets/github-homepage.jpg");
+	balloonImage = loadImage("static/assets/cute_balloon.jpg");
 	balloonX = 3000;
 
 	// Initialize Classes
