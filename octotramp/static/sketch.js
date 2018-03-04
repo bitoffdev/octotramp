@@ -88,14 +88,16 @@ class Player{
 
 function updateLeaderBoard(){
 	// Load the leaderboard
-	$.ajax({url: "leaderboard",
-			success: function(result){
-				leaders = [];
-				var listings = result.split("\n");
-				for (var i=0;i<listings.length;i++){
-					leaders.push(listings[i]);
-				}
-	}});
+	$.ajax({
+		url: "leaderboard",
+		dataType: "json",
+		success: function(result){
+			leaders = result["leaders"];
+		},
+		error: function(result){
+			console.log("The leaderboard could not be loaded");
+		}
+	});
 }
 
 function setup()
@@ -136,7 +138,7 @@ function drawLeaderboard(){
 	// List leaders
 	textAlign(RIGHT);
 	for (var i=0;i<leaders.length;i++){
-		text(leaders[i], GAME_WIDTH - 60, 70 + i * 22 + 40);
+		text(leaders[i].score + " - " + leaders[i].name, GAME_WIDTH - 60, 70 + i * 22 + 40);
 	}
 	// Display player's current score
 	text("Score: " + total_score, GAME_WIDTH - 60, 480);
