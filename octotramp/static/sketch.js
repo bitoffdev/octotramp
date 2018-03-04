@@ -225,21 +225,15 @@ function keyPressed(){
 			break;
 		case 1:
 			switch(keyCode){
+				case 65:
 				case LEFT_ARROW:
 					if(thePlayer.xpos-TRAMPOLINE_WIDTH>0)
 						thePlayer.translateX-=TRAMPOLINE_WIDTH;
 					break;
-				case A:
-					if(thePlayer.xpos-DIST_BETWEEN_TRAMPS>0)
-						thePlayer.translateX-=DIST_BETWEEN_TRAMPS;
-					break;
+				case 68:
 				case RIGHT_ARROW:
 					if(thePlayer.xpos+TRAMPOLINE_WIDTH<GAME_WIDTH)
 						thePlayer.translateX+=TRAMPOLINE_WIDTH;
-					break;
-				case D:
-					if(thePlayer.xpos+DIST_BETWEEN_TRAMPS<GAME_WIDTH)
-						thePlayer.translateX+=DIST_BETWEEN_TRAMPS;
 					break;
 				case ESCAPE:
 					gameState = 2;
