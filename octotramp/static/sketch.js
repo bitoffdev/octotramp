@@ -88,14 +88,16 @@ class Player{
 
 function updateLeaderBoard(){
 	// Load the leaderboard
-	$.ajax({url: "leaderboard",
-			success: function(result){
-				leaders = [];
-				var listings = result.split("\n");
-				for (var i=0;i<listings.length;i++){
-					leaders.push(listings[i]);
-				}
-	}});
+	$.ajax({
+		url: "leaderboard",
+		dataType: "json",
+		success: function(result){
+			leaders = result["leaders"];
+		},
+		error: function(result){
+			console.log("The leaderboard could not be loaded");
+		}
+	});
 }
 
 function setup()
@@ -103,13 +105,13 @@ function setup()
 	// set canvas size
 	createCanvas(GAME_WIDTH,GAME_HEIGHT);
 	// load images
-	characterImage = loadImage("assets/octocat.png");
-	hubotImage = loadImage("assets/hubot.jpg");
-	logo = loadImage("assets/title_logo.png");
-	rainbowImage = loadImage("assets/rainbow-straight.jpg");
-	githubFounderImage = loadImage("assets/some-loser.png")
-	githubBackgroundImage = loadImage("assets/github-homepage.jpg");
-	balloonImage = loadImage("assets/cute_balloon.jpg");
+	characterImage = loadImage("static/assets/octocat.png");
+	hubotImage = loadImage("static/assets/hubot.jpg");
+	logo = loadImage("static/assets/title_logo.png");
+	rainbowImage = loadImage("static/assets/rainbow-straight.jpg");
+	githubFounderImage = loadImage("static/assets/some-loser.png")
+	githubBackgroundImage = loadImage("static/assets/github-homepage.jpg");
+	balloonImage = loadImage("static/assets/cute_balloon.jpg");
 	balloonX = 3000;
 
 	// Initialize Classes
@@ -136,7 +138,7 @@ function drawLeaderboard(){
 	// List leaders
 	textAlign(RIGHT);
 	for (var i=0;i<leaders.length;i++){
-		text(leaders[i], GAME_WIDTH - 60, 70 + i * 22 + 40);
+		text(leaders[i].score + " - " + leaders[i].name, GAME_WIDTH - 60, 70 + i * 22 + 40);
 	}
 	// Display player's current score
 	text("Score: " + total_score, GAME_WIDTH - 60, 480);
@@ -225,21 +227,15 @@ function keyPressed(){
 			break;
 		case 1:
 			switch(keyCode){
+				case 65:
 				case LEFT_ARROW:
 					if(thePlayer.xpos-TRAMPOLINE_WIDTH>0)
 						thePlayer.translateX-=TRAMPOLINE_WIDTH;
 					break;
-				case A:
-					if(thePlayer.xpos-DIST_BETWEEN_TRAMPS>0)
-						thePlayer.translateX-=DIST_BETWEEN_TRAMPS;
-					break;
+				case 68:
 				case RIGHT_ARROW:
 					if(thePlayer.xpos+TRAMPOLINE_WIDTH<GAME_WIDTH)
 						thePlayer.translateX+=TRAMPOLINE_WIDTH;
-					break;
-				case D:
-					if(thePlayer.xpos+DIST_BETWEEN_TRAMPS<GAME_WIDTH)
-						thePlayer.translateX+=DIST_BETWEEN_TRAMPS;
 					break;
 				case ESCAPE:
 					gameState = 2;
