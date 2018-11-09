@@ -5,7 +5,7 @@
  * score to the server.
  *
  * @author Elliot Miller
- * @author Chris Baudouin
+ * @author Chris Baudouin, Jr.
  * @author Maximillian McMullen
  */
 LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
