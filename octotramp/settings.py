@@ -11,19 +11,36 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+import configparser
+import django.core.management.utils
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CONFIG_PATH = os.path.join(BASE_DIR, "config.ini")
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
+# Use config.ini
+config = configparser.RawConfigParser()
+config.read(CONFIG_PATH)
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'j-bpjxv42h^vhdvmjizk+8r@6bj_kfy0mgoa^3@))exc(0$_1a'
+
+# Load secret key if it exists, otherwise, generate it
+if 'DEFAULT' in config and 'SECRET_KEY' in config['DEFAULT']:
+    SECRET_KEY = config["DEFAULT"]["SECRET_KEY"]
+else:
+    SECRET_KEY = django.core.management.utils.get_random_secret_key()
+assert isinstance(SECRET_KEY, str)
+assert len(SECRET_KEY) == 50
+if not "DEFAULT" in config: config["DEFAULT"] = {}
+config["DEFAULT"]["SECRET_KEY"] = SECRET_KEY
+with open(CONFIG_PATH, 'w') as configfile:
+    config.write(configfile)
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
 
 ALLOWED_HOSTS = []
 
