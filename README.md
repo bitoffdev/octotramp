@@ -34,3 +34,18 @@ python3 manage.py migrate
 ```bash
 python3 manage.py runserver
 ```
+
+## Docker
+
+Build the image
+
+```bash
+docker build -t octotramp:latest .
+```
+
+Run the image
+
+```bash
+
+docker run -p 80:8000 octotramp
+```
