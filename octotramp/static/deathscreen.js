@@ -40,14 +40,13 @@ function DeathScreen(){
 	this.deathScreenKeyPressed = function() {
 		if ((keyCode==RETURN || keyCode==ENTER) && this.username.length > 0){
 			localStorage.setItem("username", this.username);
-			$.ajax({url: "leaderboard?name=" + this.username + "&score=" + total_score,
-				success: function(result){
+			fetch("leaderboard?name=" + this.username + "&score=" + total_score)
+				.then(function(result){
 					location.reload(); // Go back to the loading screen
-				},
-				error: function(result){
+				})
+				.catch(function(){
 					console.log("The high score could not be saved.");
-				}
-			});
+				});
 		} else if ((keyCode==BACKSPACE || keyCode==DELETE) && this.username.length > 0){
 			this.username = this.username.slice(0, -1);
 		} else if (LETTERS.indexOf(key) > -1 && this.username.length < 30){

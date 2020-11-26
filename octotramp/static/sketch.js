@@ -88,16 +88,17 @@ class Player{
 
 function updateLeaderBoard(){
 	// Load the leaderboard
-	$.ajax({
-		url: "leaderboard",
-		dataType: "json",
-		success: function(result){
-			leaders = result["leaders"];
-		},
-		error: function(result){
-			console.log("The leaderboard could not be loaded");
-		}
-	});
+	fetch("leaderboard")
+		.then(function(response){
+			return response.json();
+		})
+		.then(function(responseJson){
+			leaders = responseJson["leaders"];
+		})
+		.catch(function(error){
+			console.warn("The leaderboard could not be loaded");
+			console.error(error);
+		});
 }
 
 function setup()
