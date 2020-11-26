@@ -42,7 +42,7 @@ with open(CONFIG_PATH, 'w') as configfile:
 DEBUG = True
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
