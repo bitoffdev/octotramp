@@ -1,0 +1,17 @@
+{
+  "name": "octotramp-server",
+  "version": "0.1.0",
+  "main": "index.js",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "express": "^4.17.1",
+    "sequelize": "^6.3.5",
+    "sqlite3": "^5.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^2.2.0"
+  },
+  "scripts": {
+    "serve": "node src/index.js"
+  }
+}
