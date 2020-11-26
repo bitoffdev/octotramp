@@ -7,17 +7,29 @@
  * @author Chris Baudouin
  * @author Maximillian McMullen
  */
+import DeathScreen from './deathscreen';
+import Environment from './environment';
+import WaitingScreen from './waitingscreen';
+import {continueBalloon, continueFounder, continueQuotes, continueRainbow, strobe, spawnBalloon, spawnFounder, spawnQuote, spawnRainbow, spawnStrobe} from './flashyboxofgoodies';
 
+import octocatUrl from "./assets/octocat.png";
+import hubotUrl from "./assets/octocat.png";
+import logoUrl from "./assets/title_logo.png";
+import rainbowUrl from "./assets/rainbow-straight.jpg";
+import githubFounderUrl from "./assets/some-loser.png";
+import githubBackgroundUrl from "./assets/github-homepage.jpg";
+import balloonUrl from "./assets/cute_balloon.jpg";
 
-// Constant
-const MAX_SCROLL_VELOCITY = 13; // The maximum speed at which to scroll (pixels per frame)
-const JUMP_DISTANCE = 500; // Number of pixels traveled on the x-axis per jump
+import {
+	CHARACTER_WIDTH,
+	CHARACTER_HEIGHT,
+	GAME_HEIGHT,
+	GAME_WIDTH,
+	JUMP_DISTANCE,
+	MAX_SCROLL_VELOCITY,
+	TRAMPOLINE_WIDTH
+} from './constants';
 
-var jumpDuration; // Number of frames per jump
-var jumpTheta = 0.1; // Current theta of the jump height used in a sin function
-
-const GAME_WIDTH = window.innerWidth;
-const GAME_HEIGHT = window.innerHeight;
 const TITLE_SIZE = 32;
 const TITLE_POS = GAME_HEIGHT/2;
 const SUBTITLE_SIZE = 24;
@@ -36,20 +48,14 @@ const LEADERBOARD_TITLE = "Leaderboard";
 const LEADERBOARD_TITLE_XPOS = LEADERBOARD_XPOS + (LEADERBOARD_X_SIZE/2);
 const LEADERBOARD_TITLE_YPOS = LEADERBOARD_YPOS + 20;
 
-const CHARACTER_WIDTH=80;
-const CHARACTER_HEIGHT=80;
-
-const TRAMPOLINE_WIDTH=100;
-const TRAMPOLINE_HEIGHT=40;
-
 // State Variables
 var totalOffset = 0; // The sum of all offset movements
 var gameState = 0; // 0: Start Screen, 1: Play, 2: Paused, 3: Resuming, 4: Dead
 var pauseFrame = -1;
-var difficulty = 0; //determines how far a trampoline can spawn from the center
-var trampolinesPlaced = 0; //amount of trampolines jumped on, determines difficulty
+window.difficulty = 0; //determines how far a trampoline can spawn from the center
 var total_score = 0;
 var leaders = [];
+var balloonX = 3000;
 
 // Classes/Objects
 var waitingscreen;
@@ -71,15 +77,19 @@ class Player{
 	constructor(){
 		this.translateX = 0;
 		this.xpos = GAME_WIDTH / 2;
+		// Number of frames per jump
+		this.jumpDuration; 
+		// Current theta of the jump height used in a sin function
+		this.jumpTheta = 0.1;
 	}
 	drawPlayer(){
 		// Increase the y
-		jumpTheta += Math.PI / jumpDuration;
+		this.jumpTheta += Math.PI / this.jumpDuration;
 		// Lerp the x position
 		this.xpos += this.translateX * 0.25;
 		this.translateX *= 0.75;
 		// calculate the player's height
-		var yPos = GAME_HEIGHT - Math.abs(sin(jumpTheta)) * (GAME_HEIGHT-200);
+		var yPos = GAME_HEIGHT - Math.abs(sin(this.jumpTheta)) * (GAME_HEIGHT-200);
 		// player sprite
 		image(characterImage,thePlayer.xpos, yPos-100,
 			CHARACTER_WIDTH,CHARACTER_HEIGHT);
@@ -88,9 +98,11 @@ class Player{
 
 function updateLeaderBoard(){
 	// Load the leaderboard
-	fetch("leaderboard")
+	fetch("/leaderboard")
 		.then(function(response){
-			return response.json();
+			if (response.ok)
+				return response.json();
+			throw `Error while fetching leaderboard: ${response.statusText}`;
 		})
 		.then(function(responseJson){
 			leaders = responseJson["leaders"];
@@ -101,25 +113,25 @@ function updateLeaderBoard(){
 		});
 }
 
-function setup()
+window.setup = function ()
 {
 	// set canvas size
 	createCanvas(GAME_WIDTH,GAME_HEIGHT);
 	// load images
-	characterImage = loadImage("static/assets/octocat.png");
-	hubotImage = loadImage("static/assets/hubot.jpg");
-	logo = loadImage("static/assets/title_logo.png");
-	rainbowImage = loadImage("static/assets/rainbow-straight.jpg");
-	githubFounderImage = loadImage("static/assets/some-loser.png")
-	githubBackgroundImage = loadImage("static/assets/github-homepage.jpg");
-	balloonImage = loadImage("static/assets/cute_balloon.jpg");
+	characterImage = loadImage(octocatUrl);
+	hubotImage = loadImage(hubotUrl);
+	logo = loadImage(logoUrl);
+	rainbowImage = loadImage(rainbowUrl);
+	githubFounderImage = loadImage(githubFounderUrl)
+	githubBackgroundImage = loadImage(githubBackgroundUrl);
+	balloonImage = loadImage(balloonUrl);
 	balloonX = 3000;
 
 	// Initialize Classes
-	waitingscreen = new WaitingScreen(GAME_WIDTH,GAME_HEIGHT);
-	deathscreen = new DeathScreen();
-	environment = new Environment(GAME_HEIGHT);
+	waitingscreen = new WaitingScreen(GAME_WIDTH,GAME_HEIGHT,characterImage,logo);
+	deathscreen = new DeathScreen(logo);
 	thePlayer = new Player();
+	environment = new Environment(thePlayer);
 
 	environment.adjustScrollVelocity();
 	updateLeaderBoard();
@@ -163,25 +175,25 @@ function bounce(){
 }
 
 function increaseDifficulty(){
-	if (trampolinesPlaced%5==0){
+	if (environment.trampolinesPlaced%5==0){
 		// change the difficulty settings
-		difficulty += difficulty < MAX_DIFFICULTY ? 1 : 0;
+		window.difficulty += window.difficulty < MAX_DIFFICULTY ? 1 : 0;
 		// update the leaderboard every five trampolines
 		updateLeaderBoard();
 		// trigger fun flashy Stuff based on jump count
 		spawnQuote();
-		if(trampolinesPlaced%10==0)
+		if(environment.trampolinesPlaced%10==0)
 			spawnBalloon();
-		if(trampolinesPlaced%15==0)
+		if(environment.trampolinesPlaced%15==0)
 			spawnRainbow();
-		if(trampolinesPlaced%20==0)
-			spawnSeizure();
-		if(trampolinesPlaced%25==0)
+		if(environment.trampolinesPlaced%20==0)
+			spawnStrobe();
+		if(environment.trampolinesPlaced%25==0)
 			spawnFounder();
 	}
 }
 
-function draw() {
+window.draw = function () {
 	switch(gameState){
 		case 0:
 			waitingscreen.drawScreen();
@@ -190,7 +202,7 @@ function draw() {
 			total_score = int(environment.scrollPosition / JUMP_DISTANCE);
 			environment.drawEnvironment();
 			// Draw the landing highlighter
-			var screenHit = thePlayer.xpos + CHARACTER_WIDTH/2 + JUMP_DISTANCE * (1-(jumpTheta/Math.PI)%1);
+			var screenHit = thePlayer.xpos + CHARACTER_WIDTH/2 + JUMP_DISTANCE * (1-(thePlayer.jumpTheta/Math.PI)%1);
 			noStroke();
 			fill(color(255,0,0));
 			rect(screenHit - TRAMPOLINE_WIDTH/2, GAME_HEIGHT - 3, TRAMPOLINE_WIDTH, 4);
@@ -200,12 +212,12 @@ function draw() {
 
 			// flashy effects
 			continueQuotes();
-			continueBalloon();
-			continueRainbow();
+			continueBalloon(thePlayer, balloonImage);
+			continueRainbow(rainbowImage);
 			strobe();
-			continueFounder();
+			continueFounder(githubFounderImage);
 			// Generate the next trampoline each time the player touches the ground
-			if (jumpTheta%Math.PI < 0.05){
+			if (thePlayer.jumpTheta%Math.PI < 0.05){
 				bounce();
 			}
 			break;
@@ -213,7 +225,7 @@ function draw() {
 			gameState = 1;
 			break;
 		case 4:
-			deathscreen.drawDeathScreen();
+			deathscreen.drawDeathScreen(total_score);
 			break;
 	}
 }
@@ -221,7 +233,7 @@ function draw() {
 /**
  * Handle keyboard input.
  */
-function keyPressed(){
+window.keyPressed = function(){
 	switch(gameState){
 		case 0: // The game is just starting, reset everything
 			gameState = 1;
@@ -248,7 +260,8 @@ function keyPressed(){
 				gameState = 3;
 			break;
 		case 4:
-			deathscreen.deathScreenKeyPressed();
+			deathscreen.deathScreenKeyPressed(total_score);
 			break;
 	}
 }
+

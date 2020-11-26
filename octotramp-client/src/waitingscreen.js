@@ -7,7 +7,7 @@ const START_MESSAGE_SIZE = 24;
 ///@param width  the width of the display
 ///@param height  the height of the display
 ///
-function WaitingScreen(width, height){
+export default function WaitingScreen(width, height, characterImage, logo){
 	this.width = width;
 	this.height = height;
 	this.game_title_pos = ((height/2)/25);

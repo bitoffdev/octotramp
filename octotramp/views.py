@@ -3,7 +3,8 @@ from django.http import JsonResponse
 from octotramp.models import Leader
 
 def home(request):
-    return render(request, 'home/index.html')
+    return redirect('/static/index.html')
+    # return render(request, 'home/index.html')
 
 def leaderboard(request):
     name = request.GET.get("name", None)

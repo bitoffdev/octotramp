@@ -1,4 +1,4 @@
-
+import {GAME_HEIGHT, GAME_WIDTH} from './constants';
 
 
 //strings that will float around as the user plays.
@@ -63,7 +63,7 @@ var founderRotation=0;
 Creates a random quote from the list, and initializes it to float across the
 screen in a random location.
 */
-function spawnQuote(){
+export function spawnQuote(){
 
 	var activeQuote=new Quote();
 
@@ -88,7 +88,7 @@ function spawnQuote(){
 	}
 	//coming from top
 	else{
-		topPos=start-(STRINGS_ABOVE);
+		var topPos=start-(STRINGS_ABOVE);
 
 		if(topPos<STRINGS_WITHIN_EDGE)
 			activeQuote.x=topPos;
@@ -108,9 +108,9 @@ function spawnQuote(){
 Continue each quote animation, having each float in the direction they were
 initialized in. If a quote goes offscreen, it is removed.
 */
-function continueQuotes(){
+export function continueQuotes(){
 	for(var i=0;activeQuotes && i<activeQuotes.length;i++){
-		current=activeQuotes[i];
+		var current=activeQuotes[i];
 
 		switch(current.direction){
 			case "right":
@@ -147,7 +147,7 @@ function continueQuotes(){
 x position is reset to 0, so that it appears as though it just appeared.
 Lazy? Yes. Effective? Also yes.
 */
-function spawnBalloon(){
+export function spawnBalloon(){
 	var start=int(Math.random()*GAME_HEIGHT/2);
 
 	balloonX=0;
@@ -159,25 +159,25 @@ function spawnBalloon(){
 /**
 Continues balloon animation in a circular pattern across the screen
 */
-function continueBalloon(){
+export function continueBalloon(thePlayer, balloonImage){
 	if(!balloonActive)
 		return;
 
 	balloonX+=5;
-	var balloonXPos=(sin(3*frameCount/jumpDuration)+1)*100 + balloonX;
-	var balloonYPos=(cos(3*frameCount/jumpDuration)+1)*GAME_HEIGHT/2 - balloonY;
+	var balloonXPos=(sin(3*frameCount/thePlayer.jumpDuration)+1)*100 + balloonX;
+	var balloonYPos=(cos(3*frameCount/thePlayer.jumpDuration)+1)*GAME_HEIGHT/2 - balloonY;
 
 	image(balloonImage,balloonXPos, balloonYPos,100,100);
 
 	if(balloonX>GAME_WIDTH)
-		ballonActive=false;
+		balloonActive=false;
 }
 
 
 /**
 Trigger the rainbow animation
 */
-function spawnRainbow(){
+export function spawnRainbow(){
 	rainbowXs.push(-RAINBOW_WIDTH);
 	rainbowActive=true;
 }
@@ -186,7 +186,7 @@ function spawnRainbow(){
 Have a rainbow fall through the screen diagonally, continuing through the top
 until the rainbow has reached the right side of the screen.
 */
-function continueRainbow(){
+export function continueRainbow(rainbowImage){
 
 	if(!rainbowActive)
 		return;
@@ -197,7 +197,7 @@ function continueRainbow(){
 
 	for(var i=0;i<rainbowXs.length;i++){
 		rainbowXs[i]+=RAINBOW_SPEED;
-		rainbowY=-2*i*RAINBOW_HEIGHT;
+		var rainbowY=-2*i*RAINBOW_HEIGHT;
 		image(rainbowImage,rainbowXs[i],rainbowY,RAINBOW_WIDTH,RAINBOW_HEIGHT);
 
 
@@ -220,7 +220,7 @@ function continueRainbow(){
 /**
 Trigger the strobe effect
 */
-function spawnSeizure(){
+export function spawnStrobe(){
 	strobeStart=frameCount;
 	strobeActive=true;
 }
@@ -230,7 +230,7 @@ Rapidly change the color of the screen for a strobe effect.
 The screen flickers for an amount of frames equal to STROBE_FRAMES, after which
 it stops.
 */
-function strobe(){
+export function strobe(){
 
 	if(!strobeActive)
 		return;
@@ -252,7 +252,7 @@ function strobe(){
 /**
 Trigger animation using a picture of github's founder
 */
-function spawnFounder(){
+export function spawnFounder(){
 	founderX=0;
 	founderY=GAME_HEIGHT/2;
 	founderRotation=0;
@@ -262,7 +262,7 @@ function spawnFounder(){
 /**
 Maintain a spinny animation of github's founder
 */
-function continueFounder(){
+export function continueFounder(githubFounderImage){
 	if(!founderActive)
 		return;
 

@@ -12,17 +12,29 @@
  * @author Chris Baudouin
  * @author Maximillian McMullen
  */
-function Environment(){
+import {
+	CHARACTER_WIDTH,
+	CHARACTER_HEIGHT,
+	GAME_HEIGHT,
+	GAME_WIDTH,
+	JUMP_DISTANCE,
+	MAX_SCROLL_VELOCITY,
+	TRAMPOLINE_HEIGHT,
+	TRAMPOLINE_WIDTH
+} from './constants';
+
+export default function Environment(thePlayer){
 	this.scrollPosition = 0; // Current scrolling position on the x-axis
 	this.scrollVelocity; // Current rate that the environment scrolls on the x-axis
 	this.translateX = 0; // This value is used for arrow-key translation
 
 	this.trampolines = [];
+	this.trampolinesPlaced = 0;
 
 	this.adjustScrollVelocity = function(){
 		var x = 4 + this.scrollPosition / JUMP_DISTANCE;
 		this.scrollVelocity = MAX_SCROLL_VELOCITY * (1 - 1 / Math.sqrt(x));
-		jumpDuration = JUMP_DISTANCE / this.scrollVelocity;
+		thePlayer.jumpDuration = JUMP_DISTANCE / this.scrollVelocity;
 	}
 
 	this.addTrampoline = function(x){
@@ -30,16 +42,16 @@ function Environment(){
 	}
 
 	this.placeTrampoline = function(){
-		trampolinesPlaced++;
+		this.trampolinesPlaced++;
 		var scrollHit;
 		if (this.trampolines.length == 0){
 			var scrollPlayer = this.scrollPosition + thePlayer.xpos + CHARACTER_WIDTH/2;
-			scrollHit = scrollPlayer + JUMP_DISTANCE * (1-(jumpTheta/Math.PI)%1);
+			scrollHit = scrollPlayer + JUMP_DISTANCE * (1-(thePlayer.jumpTheta/Math.PI)%1);
 		} else {
 			scrollHit = this.trampolines[this.trampolines.length-1] + JUMP_DISTANCE;
 		}
 		// Get random offset based on difficulty
-		var offSlots = int(Math.random() * (2 * difficulty + 1)) - difficulty;
+		var offSlots = int(Math.random() * (2 * window.difficulty + 1)) - window.difficulty;
 		scrollHit = scrollHit + offSlots * TRAMPOLINE_WIDTH;
 		// add the trampoline
 		this.addTrampoline(scrollHit);
@@ -62,11 +74,11 @@ function Environment(){
 		// Draw all the trampolines
 		fill(color(156, 218, 239));
 		// Animate the trampoline when the player is jumping
-		if (jumpTheta%Math.PI < 0.1){
+		if (thePlayer.jumpTheta%Math.PI < 0.1){
 			var scrollPlayer = this.scrollPosition + thePlayer.xpos + CHARACTER_WIDTH/2;
 			for (var i=0;i<this.trampolines.length;i++){
 				var absDiff = Math.abs(scrollPlayer - this.trampolines[i]);
-				var h = absDiff > 50 ? 30 : 15 + jumpTheta%Math.PI * 150;
+				var h = absDiff > 50 ? 30 : 15 + thePlayer.jumpTheta%Math.PI * 150;
 				ellipse(this.trampolines[i]-this.scrollPosition, GAME_HEIGHT-h,
 					TRAMPOLINE_WIDTH,TRAMPOLINE_HEIGHT);
 			}

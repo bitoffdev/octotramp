@@ -1,7 +1,0 @@
-{
-  "name": "octotramp-client",
-  "version": "1.0.0",
-  "dependencies": {
-    "p5": "^0.5.4"
-  }
-}

@@ -8,16 +8,17 @@
  * @author Chris Baudouin, Jr.
  * @author Maximillian McMullen
  */
-LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+import {GAME_HEIGHT, GAME_WIDTH} from './constants';
+const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-function DeathScreen(){
+export default function DeathScreen(logo){
 	this.submitted = false;
 	this.username = localStorage.getItem("username");
 	if (this.username==null){
 		this.username = "";
 	}
 
-	this.drawDeathScreen = function(){
+	this.drawDeathScreen = function(total_score){
 		// Use an alpha value of 20 to fade the red background in
 		background(220,0,0, 20);
 		// Draw the logo
@@ -37,15 +38,19 @@ function DeathScreen(){
 		}
 	}
 
-	this.deathScreenKeyPressed = function() {
+	this.deathScreenKeyPressed = function(total_score) {
 		if ((keyCode==RETURN || keyCode==ENTER) && this.username.length > 0){
 			localStorage.setItem("username", this.username);
-			fetch("leaderboard?name=" + this.username + "&score=" + total_score)
+			fetch("/leaderboard?name=" + this.username + "&score=" + total_score)
 				.then(function(result){
-					location.reload(); // Go back to the loading screen
+					if (!response.ok) throw `Error while submitting score to leaderboard: ${response.statusText}`;
 				})
 				.catch(function(){
 					console.log("The high score could not be saved.");
+				})
+				.finally(function(){
+					// Go back to the loading screen
+					location.reload();
 				});
 		} else if ((keyCode==BACKSPACE || keyCode==DELETE) && this.username.length > 0){
 			this.username = this.username.slice(0, -1);
