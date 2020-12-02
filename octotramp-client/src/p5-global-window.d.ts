@@ -3,6 +3,6 @@
  * TypeScript will recognize the methods used by P5.js in global mode.
  */
 interface Window {
-	draw: any;
-	setup: any;
+  draw: any;
+  setup: any;
 }
