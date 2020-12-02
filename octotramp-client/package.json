@@ -5,7 +5,8 @@
     "@types/p5": "^0.9.1",
     "clean-webpack-plugin": "^3.0.0",
     "html-webpack-plugin": "^4.5.0",
-    "p5": "^0.5.4"
+    "p5": "^0.5.4",
+    "prettier": "^2.2.1"
   },
   "devDependencies": {
     "file-loader": "^6.2.0",
