@@ -7,10 +7,13 @@
  * @author Chris Baudouin
  * @author Maximillian McMullen
  */
+import {Image} from 'p5';
+
 import DeathScreen from './deathscreen';
 import Environment from './environment';
 import WaitingScreen from './waitingscreen';
 import {continueBalloon, continueFounder, continueQuotes, continueRainbow, strobe, spawnBalloon, spawnFounder, spawnQuote, spawnRainbow, spawnStrobe} from './flashyboxofgoodies';
+import Player from './player';
 
 import octocatUrl from "./assets/octocat.png";
 import hubotUrl from "./assets/octocat.png";
@@ -52,49 +55,25 @@ const LEADERBOARD_TITLE_YPOS = LEADERBOARD_YPOS + 20;
 var totalOffset = 0; // The sum of all offset movements
 var gameState = 0; // 0: Start Screen, 1: Play, 2: Paused, 3: Resuming, 4: Dead
 var pauseFrame = -1;
-window.difficulty = 0; //determines how far a trampoline can spawn from the center
 var total_score = 0;
-var leaders = [];
+var leaders: any = [];
 var balloonX = 3000;
 
 // Classes/Objects
-var waitingscreen;
-var deathscreen;
-var environment;
-var thePlayer;
+let waitingscreen: WaitingScreen;
+let deathscreen: DeathScreen;
+let environment: Environment;
+let thePlayer: Player;
 
 // Assets
-var characterImage;
-var trampolineImage;
-var balloonImage;
-var rainbowImage;
-var githubFounderImage;
+var characterImage: Image;
+var trampolineImage: Image;
+var balloonImage: Image;
+var rainbowImage: Image;
+var githubFounderImage: Image;
 var hubotImage;
 var logo;
 var githubBackgroundImage;
-
-class Player{
-	constructor(){
-		this.translateX = 0;
-		this.xpos = GAME_WIDTH / 2;
-		// Number of frames per jump
-		this.jumpDuration; 
-		// Current theta of the jump height used in a sin function
-		this.jumpTheta = 0.1;
-	}
-	drawPlayer(){
-		// Increase the y
-		this.jumpTheta += Math.PI / this.jumpDuration;
-		// Lerp the x position
-		this.xpos += this.translateX * 0.25;
-		this.translateX *= 0.75;
-		// calculate the player's height
-		var yPos = GAME_HEIGHT - Math.abs(sin(this.jumpTheta)) * (GAME_HEIGHT-200);
-		// player sprite
-		image(characterImage,thePlayer.xpos, yPos-100,
-			CHARACTER_WIDTH,CHARACTER_HEIGHT);
-	}
-}
 
 function updateLeaderBoard(){
 	// Load the leaderboard
@@ -130,7 +109,7 @@ window.setup = function ()
 	// Initialize Classes
 	waitingscreen = new WaitingScreen(GAME_WIDTH,GAME_HEIGHT,characterImage,logo);
 	deathscreen = new DeathScreen(logo);
-	thePlayer = new Player();
+	thePlayer = new Player(characterImage);
 	environment = new Environment(thePlayer);
 
 	environment.adjustScrollVelocity();
@@ -177,7 +156,7 @@ function bounce(){
 function increaseDifficulty(){
 	if (environment.trampolinesPlaced%5==0){
 		// change the difficulty settings
-		window.difficulty += window.difficulty < MAX_DIFFICULTY ? 1 : 0;
+		environment.difficulty += environment.difficulty < MAX_DIFFICULTY ? 1 : 0;
 		// update the leaderboard every five trampolines
 		updateLeaderBoard();
 		// trigger fun flashy Stuff based on jump count

@@ -22,42 +22,54 @@ import {
 	TRAMPOLINE_HEIGHT,
 	TRAMPOLINE_WIDTH
 } from './constants';
+import Player from './player';
 
-export default function Environment(thePlayer){
-	this.scrollPosition = 0; // Current scrolling position on the x-axis
-	this.scrollVelocity; // Current rate that the environment scrolls on the x-axis
-	this.translateX = 0; // This value is used for arrow-key translation
+export default class Environment {
+	difficulty: number;
+	scrollPosition: number;
+	scrollVelocity: number;
+	thePlayer: Player;
+	translateX: number;
+	trampolines: number[];
+	trampolinesPlaced: number;
 
-	this.trampolines = [];
-	this.trampolinesPlaced = 0;
-
-	this.adjustScrollVelocity = function(){
-		var x = 4 + this.scrollPosition / JUMP_DISTANCE;
-		this.scrollVelocity = MAX_SCROLL_VELOCITY * (1 - 1 / Math.sqrt(x));
-		thePlayer.jumpDuration = JUMP_DISTANCE / this.scrollVelocity;
+	constructor(thePlayer: Player){
+		this.difficulty = 0; // determines how far a trampoline can spawn from the center
+		this.scrollPosition = 0; // Current scrolling position on the x-axis
+		this.scrollVelocity; // Current rate that the environment scrolls on the x-axis
+		this.thePlayer = thePlayer;
+		this.translateX = 0; // This value is used for arrow-key translation
+		this.trampolines = [];
+		this.trampolinesPlaced = 0;
 	}
 
-	this.addTrampoline = function(x){
+	adjustScrollVelocity (){
+		var x = 4 + this.scrollPosition / JUMP_DISTANCE;
+		this.scrollVelocity = MAX_SCROLL_VELOCITY * (1 - 1 / Math.sqrt(x));
+		this.thePlayer.jumpDuration = JUMP_DISTANCE / this.scrollVelocity;
+	}
+
+	addTrampoline = function(x: number){
 		this.trampolines.push(x);
 	}
 
-	this.placeTrampoline = function(){
+	placeTrampoline = function(){
 		this.trampolinesPlaced++;
 		var scrollHit;
 		if (this.trampolines.length == 0){
-			var scrollPlayer = this.scrollPosition + thePlayer.xpos + CHARACTER_WIDTH/2;
-			scrollHit = scrollPlayer + JUMP_DISTANCE * (1-(thePlayer.jumpTheta/Math.PI)%1);
+			var scrollPlayer = this.scrollPosition + this.thePlayer.xpos + CHARACTER_WIDTH/2;
+			scrollHit = scrollPlayer + JUMP_DISTANCE * (1-(this.thePlayer.jumpTheta/Math.PI)%1);
 		} else {
 			scrollHit = this.trampolines[this.trampolines.length-1] + JUMP_DISTANCE;
 		}
 		// Get random offset based on difficulty
-		var offSlots = int(Math.random() * (2 * window.difficulty + 1)) - window.difficulty;
+		var offSlots = int(Math.random() * (2 * this.difficulty + 1)) - this.difficulty;
 		scrollHit = scrollHit + offSlots * TRAMPOLINE_WIDTH;
 		// add the trampoline
 		this.addTrampoline(scrollHit);
 	}
 
-	this.drawEnvironment = function(){
+	drawEnvironment = function(){
 		// Scroll the background
 		this.scrollPosition += this.scrollVelocity;
 		// Draw the environment
@@ -74,11 +86,11 @@ export default function Environment(thePlayer){
 		// Draw all the trampolines
 		fill(color(156, 218, 239));
 		// Animate the trampoline when the player is jumping
-		if (thePlayer.jumpTheta%Math.PI < 0.1){
-			var scrollPlayer = this.scrollPosition + thePlayer.xpos + CHARACTER_WIDTH/2;
+		if (this.thePlayer.jumpTheta%Math.PI < 0.1){
+			var scrollPlayer = this.scrollPosition + this.thePlayer.xpos + CHARACTER_WIDTH/2;
 			for (var i=0;i<this.trampolines.length;i++){
 				var absDiff = Math.abs(scrollPlayer - this.trampolines[i]);
-				var h = absDiff > 50 ? 30 : 15 + thePlayer.jumpTheta%Math.PI * 150;
+				var h = absDiff > 50 ? 30 : 15 + this.thePlayer.jumpTheta%Math.PI * 150;
 				ellipse(this.trampolines[i]-this.scrollPosition, GAME_HEIGHT-h,
 					TRAMPOLINE_WIDTH,TRAMPOLINE_HEIGHT);
 			}
