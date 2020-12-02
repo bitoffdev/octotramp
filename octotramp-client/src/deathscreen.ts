@@ -8,21 +8,27 @@
  * @author Chris Baudouin, Jr.
  * @author Maximillian McMullen
  */
+import {Image} from 'p5';
 import {GAME_HEIGHT, GAME_WIDTH} from './constants';
+
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-export default function DeathScreen(logo){
-	this.submitted = false;
-	this.username = localStorage.getItem("username");
-	if (this.username==null){
-		this.username = "";
+export default class DeathScreen{
+	logo: Image;
+	submitted: boolean;
+	username: string;
+
+	constructor (logo: Image){
+		this.logo = logo;
+		this.submitted = false;
+		this.username = localStorage.getItem("username") ?? "";
 	}
 
-	this.drawDeathScreen = function(total_score){
+	drawDeathScreen = function(total_score: number){
 		// Use an alpha value of 20 to fade the red background in
 		background(220,0,0, 20);
 		// Draw the logo
-		image(logo, 0, 0);
+		image(this.logo, 0, 0);
 		// Draw the text input
 		if (!this.submitted){
 			fill(255);
@@ -38,11 +44,11 @@ export default function DeathScreen(logo){
 		}
 	}
 
-	this.deathScreenKeyPressed = function(total_score) {
+	deathScreenKeyPressed = function(total_score: number) {
 		if ((keyCode==RETURN || keyCode==ENTER) && this.username.length > 0){
 			localStorage.setItem("username", this.username);
 			fetch("/leaderboard?name=" + this.username + "&score=" + total_score)
-				.then(function(result){
+				.then(function(response){
 					if (!response.ok) throw `Error while submitting score to leaderboard: ${response.statusText}`;
 				})
 				.catch(function(){

@@ -1,4 +1,6 @@
+import {Image} from 'p5';
 import {GAME_HEIGHT, GAME_WIDTH} from './constants';
+import Player from './player';
 
 
 //strings that will float around as the user plays.
@@ -20,6 +22,11 @@ var INSPIRATIONAL_STRINGS=[
 ];
 
 class Quote{
+	x: number;
+	y: number;
+	text: string;
+	direction: string;
+
 	constructor(){
 		this.x=0;
 		this.y=0;
@@ -37,13 +44,13 @@ var STRING_SPEED=5;
 var STRINGS_ABOVE=GAME_HEIGHT/2; //top half
 var STRINGS_WITHIN_EDGE=GAME_WIDTH/3; //within 1/3 of edge
 
-var activeQuotes=[];
+var activeQuotes: Quote[] = [];
 
 var balloonX=0;
 var balloonY=0;
 var balloonActive=false;
 
-var rainbowXs=[];
+var rainbowXs: number[] =[];
 var rainbowActive=false;
 const RAINBOW_WIDTH=1200;
 const RAINBOW_HEIGHT=100;
@@ -99,8 +106,6 @@ export function spawnQuote(){
 		activeQuote.direction="down";
 	}
 
-	//console.log("x="+activeQuote.x+" y="+activeQuote.y+" dir="+activeQuote.direction);
-
 	activeQuotes.push(activeQuote);
 }
 
@@ -136,7 +141,7 @@ export function continueQuotes(){
 
 		if(current.x<0 || current.x>GAME_WIDTH ||
 			current.y<0 || current.y>GAME_HEIGHT){
-				activeQuotes.pop(i);
+				activeQuotes.pop();
 				i--;
 		}
 	}
@@ -159,7 +164,7 @@ export function spawnBalloon(){
 /**
 Continues balloon animation in a circular pattern across the screen
 */
-export function continueBalloon(thePlayer, balloonImage){
+export function continueBalloon(thePlayer: Player, balloonImage: Image){
 	if(!balloonActive)
 		return;
 
@@ -186,7 +191,7 @@ export function spawnRainbow(){
 Have a rainbow fall through the screen diagonally, continuing through the top
 until the rainbow has reached the right side of the screen.
 */
-export function continueRainbow(rainbowImage){
+export function continueRainbow(rainbowImage: Image){
 
 	if(!rainbowActive)
 		return;
@@ -211,7 +216,7 @@ export function continueRainbow(rainbowImage){
 		rainbowActive=false;
 
 		while(rainbowXs.length>0)
-			rainbowXs.pop(0);
+			rainbowXs.pop();
 	}
 
 	pop();
@@ -262,7 +267,7 @@ export function spawnFounder(){
 /**
 Maintain a spinny animation of github's founder
 */
-export function continueFounder(githubFounderImage){
+export function continueFounder(githubFounderImage: Image){
 	if(!founderActive)
 		return;
 
